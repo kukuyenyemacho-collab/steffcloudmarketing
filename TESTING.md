@@ -1,9 +1,9 @@
 # Test report
 
-Run on 4 October 2026 against the production build, served locally with the production security headers.
+Run on 4 October 2026 against the production build (v3: 51 pages), served locally with the production security headers.
 
 ## End-to-end stress test — `npm test`
-**36 pages × 3 screen sizes (phone 360px dark, tablet 768px light, desktop 1440px light) · 1,364 checks · 0 failures · 0 warnings**
+**51 pages × 3 screen sizes (phone 360px dark, tablet 768px light, desktop 1440px light) · 1,923 checks · 0 failures · 0 warnings**
 
 Every page, at every size:
 - HTTP 200, one `<h1>`, title, meta description, canonical, `lang`, valid JSON-LD
@@ -27,6 +27,10 @@ Features exercised in a real browser:
 - Blog topic filter and glossary search (including no-results message)
 - Keyboard: first Tab reaches “Skip to content”
 - Copy-to-clipboard and open-now status
+- Digital Marketing Grader: scoring, partial answers, top-fix ordering and WhatsApp hand-off with the score
+- WhatsApp link generator: Kenyan and international numbers, invalid input
+- Academy: lesson progress percentage, saved across reloads
+- Footer: Japanese name ステフクラウド loads in its font with `lang="ja"`; company name on one line
 
 Issues the first run caught and that were fixed: hidden table labels and the rotated marquee made pages scroll sideways on phones; two colour-contrast failures; scrollable tables not keyboard-focusable; heading-order gaps; empty table headers; six over-long meta descriptions.
 
@@ -35,18 +39,20 @@ Single Node.js process on a small cloud container (a CDN in production will be m
 
 | Metric | Result |
 |---|---|
-| Concurrent connections | 200 for 20 s, all 40 URLs |
-| Requests served | 148,897 (≈ 7,400 per second) |
+| Concurrent connections | 200 for 20 s, all 55 URLs |
+| Requests served | 153,371 (≈ 7,660 per second) |
 | Errors / non-2xx | 0 / 0 |
-| Latency p50 / p90 / p99 | 26 ms / 30 ms / 113 ms |
-| Spike: 2,000 simultaneous requests | all completed in 275 ms |
+| Latency p50 / p99 | 25 ms / 100 ms |
+| Spike: 2,000 simultaneous requests | all completed in 249 ms |
 
 ## Lighthouse 13 (mobile, simulated slow 4G)
 | Page | Performance | Accessibility | Best Practices | SEO | LCP | CLS | Weight |
 |---|---|---|---|---|---|---|---|
-| Home | 99 | 100 | 100 | 100 | 2.0 s | 0 | 182 KB |
-| Pricing | 100 | 100 | 100 | 100 | 1.7 s | 0.001 | 178 KB |
-| Blog article | 99 | 100 | 100 | 100 | 2.0 s | 0 | 178 KB |
+| Home | 98 | 100 | 100 | 100 | 2.1 s | 0 | 187 KB |
+| Marketing grader | 99 | 100 | 100 | 100 | 2.0 s | 0 | 181 KB |
+| Industry: real estate | 100 | 100 | 100 | 100 | 1.7 s | 0 | 181 KB |
+| Academy | 99 | 100 | 100 | 100 | 2.0 s | 0 | 180 KB |
+| Pricing (v2) | 100 | 100 | 100 | 100 | 1.7 s | 0.001 | 178 KB |
 
 ## Dependencies
 `npm audit`: 0 vulnerabilities. Dev-only tools: esbuild, axe-core, Playwright. Nothing third-party ships to visitors.

@@ -20,7 +20,7 @@ export async function buildAssets(out) {
   for (const [name, dir, loader] of [['styles.css', 'css', 'css'], ['main.js', 'js', 'js']]) {
     const source = readFileSync(join(SRC, name), 'utf8');
     const code = esbuild
-      ? (await esbuild.transform(source, { loader, minify: true, target: ['es2019', 'chrome90', 'safari14', 'firefox90'] })).code
+      ? (await esbuild.transform(source, { loader, minify: true, target: ['chrome90', 'safari15', 'firefox90', 'edge90'] })).code
       : source;
     mkdirSync(join(out, 'assets', dir), { recursive: true });
     writeFileSync(join(out, 'assets', dir, name), code);

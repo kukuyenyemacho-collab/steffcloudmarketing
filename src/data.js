@@ -4,7 +4,8 @@
 export const site = {
   name: 'Steff Cloud',
   legalName: 'Steff Cloud Limited',
-  chineseName: '斯蒂夫云',
+  // Katakana for “Steff Cloud” (Sutefu Kuraudo).
+  japaneseName: 'ステフクラウド',
   // Canonical origin of THIS marketing site. Change if you deploy to a different domain.
   url: 'https://marketing.steffcloud.co.ke',
   mainSite: 'https://steffcloud.co.ke',
@@ -370,10 +371,10 @@ export const comparison = [
 ];
 
 export const nav = [
-  { label: 'Services', href: '/services/', children: true },
+  { label: 'Services', href: '/services/', mega: 'services' },
+  { label: 'Industries', href: '/industries/', mega: 'industries' },
   { label: 'Pricing', href: '/pricing/' },
-  { label: 'Nakuru', href: '/digital-marketing-agency-nakuru/' },
-  { label: 'Learn', href: '/blog/' },
+  { label: 'Resources', href: '/resources/', mega: 'resources' },
   { label: 'Global', href: '/international/' },
   { label: 'About', href: '/about/' },
   { label: 'Contact', href: '/contact/' },

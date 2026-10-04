@@ -222,7 +222,7 @@ export const legal = [
     description: 'Company information, registered office and contact details for Steff Cloud Limited.',
     body: `
 <h2>Company information</h2>
-<p><b>${site.legalName}</b> (${site.chineseName}), a private limited company incorporated in Kenya under the Companies Act, 2015. Established ${site.founded}.</p>
+<p><b>${site.legalName}</b> (${site.japaneseName}), a private limited company incorporated in Kenya under the Companies Act, 2015. Established ${site.founded}.</p>
 <ul>
   <li><b>Registered office:</b> ${site.address.street}, ${site.address.locality}, ${site.address.region}, Kenya</li>
   ${ids.registrationNo ? `<li><b>Company registration number:</b> ${ids.registrationNo}</li>` : ''}

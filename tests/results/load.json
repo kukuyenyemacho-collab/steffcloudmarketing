@@ -1,22 +1,22 @@
 {
   "connections": 200,
   "durationSeconds": 20,
-  "urls": 40,
-  "requests": 148897,
-  "requestsPerSecond": 7439,
+  "urls": 55,
+  "requests": 153371,
+  "requestsPerSecond": 7664,
   "latencyMs": {
-    "p50": 26.3,
-    "p90": 29.5,
-    "p99": 113.4,
-    "max": 1135.2
+    "p50": 25.4,
+    "p90": 28.5,
+    "p99": 99.7,
+    "max": 1163.5
   },
-  "ok": 148897,
+  "ok": 153371,
   "non2xx": 0,
   "errors": 0,
-  "megabytesServed": 1395,
+  "megabytesServed": 1545.9,
   "burst": {
     "requests": 2000,
-    "totalMs": 275,
+    "totalMs": 249,
     "completed": 2000
   }
 }

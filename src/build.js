@@ -10,6 +10,8 @@ import {
   breadcrumb, faqSchema, orgId, fmtDate, mapEmbed, currencySelect, mapsLink,
 } from './lib.js';
 import { extraPages, growthCalculator, globalTeaser } from './pages-extra.js';
+import { growthPages, storySection, channelsStrip, industriesTeaser, resourcesTeaser } from './pages-growth.js';
+import { industries, tools } from './growth.js';
 import { writeDeployFiles, buildAssets } from './deploy.js';
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
@@ -100,7 +102,7 @@ emit(
   <div class="hero-copy">
     <h1><span class="kicker">Digital marketing agency in Nakuru, Kenya</span>Make your brand <em>impossible</em> to ignore.</h1>
     <p class="lede">SEO, AI search, social media, ads and WhatsApp marketing that turn attention into <b>M-Pesa notifications</b> — for ambitious businesses in Nakuru and across Kenya.</p>
-    <div class="btns"><a class="btn btn-solid btn-lg" href="/free-audit/">Get my free growth audit ${icon('arrow')}</a><a class="btn btn-line btn-lg" href="/pricing/">See pricing</a></div>
+    <div class="btns"><a class="btn btn-accent btn-lg" href="/free-audit/">Get my free growth audit ${icon('arrow')}</a><a class="btn btn-line btn-lg" href="/pricing/">See pricing</a></div>
     <ul class="trust">
       <li>${icon('check')}Plans from KES 8,000/mo</li>
       <li>${icon('check')}You own every account</li>
@@ -110,6 +112,7 @@ emit(
   <div class="hero-form">${leadForm({ id: 'hero', compact: true, source: 'home-hero' })}</div>
 </div></section>
 ${marquee()}
+${channelsStrip()}
 <section class="section stats-sec"><div class="wrap">
   <div class="statement"><p>Most Nakuru businesses don’t have a marketing problem. They have a <u>system</u> problem: posts with no strategy, ads with no tracking, leads with no follow-up. <b>We fix the system.</b></p></div>
   <dl class="facts">
@@ -119,7 +122,9 @@ ${marquee()}
     <div><dt>100%</dt><dd>of accounts and content owned by you</dd></div>
   </dl>
 </div></section>
+${storySection()}
 ${servicesGrid()}
+${industriesTeaser()}
 ${processSection()}
 ${compareSection()}
 ${geoSection()}
@@ -132,6 +137,7 @@ ${globalTeaser()}
   <div class="sec-head"><p class="eyebrow">FAQ</p><h2>Questions Nakuru business owners ask us.</h2><p>Can’t find yours? <a href="${wa('Hi Steff Cloud, I have a question:')}" target="_blank" rel="noopener">Ask on WhatsApp</a>.</p></div>
   ${faqList(faqs)}
 </div></section>
+${resourcesTeaser()}
 ${blogTeaser()}
 ${ctaBand()}`,
   }),
@@ -354,12 +360,13 @@ emit(
 <section class="section"><div class="wrap two-col">
   <div class="about-logo"><span class="logo-mark" role="img" aria-label="Steff Cloud logo: Creative Agency, established 2026"></span></div>
   <div class="prose">
-    <h2>Our story</h2>
-    <p>We grew up online. We know how attention works on TikTok, Instagram and Google because we live there — and we have seen too many great Kenyan businesses stay invisible because their marketing was an afterthought.</p>
-    <p>Steff Cloud is a full digital partner — websites, AI automation, branding and digital marketing. This site is dedicated to our digital marketing practice: the team that helps businesses get found, get chosen and get paid.</p>
-    <p>We also built <a href="${site.mainSite}/nakuru-digital" target="_blank" rel="noopener">Nakuru Digital</a>, Nakuru’s first business and tech hub, where we help local businesses get listed and train young people to become developers, designers, AI builders and marketers.</p>
+    <h2>Our story, so far</h2>
+    <p><b>It started with a question.</b> Why do so many brilliant businesses in Nakuru stay invisible? We kept meeting owners with great products, loyal customers and quiet phones. Their competitors were not better. They were simply easier to find, easier to trust and easier to message.</p>
+    <p><b>We grew up online, so we knew the answer.</b> Attention lives on Google, TikTok, Instagram and WhatsApp, and now inside AI assistants too. The businesses that win there are not the loudest. They are the most consistent, the most helpful and the fastest to reply.</p>
+    <p><b>So we built Steff Cloud on Nakuru–Solai Road.</b> It is a full digital partner for websites, AI automation, branding and marketing. We also built <a href="${site.mainSite}/nakuru-digital" target="_blank" rel="noopener">Nakuru Digital</a>, a free hub where local businesses get listed and young people train as developers, designers, AI builders and marketers.</p>
+    <p><b>This site is the next chapter.</b> It is our digital marketing practice, dedicated to one job: helping businesses in Nakuru, across Kenya and beyond get found, get chosen and get paid. Your business is the hero of that story. We are the guide with the map.</p>
     <h2>Our mission</h2>
-    <p>To make every ambitious business in Nakuru — and Kenya — impossible to ignore online, and to prove that world-class marketing can be built right here.</p>
+    <p>To make every ambitious business in Nakuru, and Kenya, impossible to ignore online, and to prove that world-class marketing can be built right here.</p>
   </div>
 </div></section>
 <section class="section inv"><div class="wrap">
@@ -564,7 +571,7 @@ emit(
 );
 
 // ---------- International, calculator & extra legal pages ----------
-for (const x of extraPages()) emit(x.path, page(x.page), x.opts);
+for (const x of [...extraPages(), ...growthPages()]) emit(x.path, page(x.page), x.opts);
 
 // ---------- Machine-readable files ----------
 writeFileSync(
@@ -610,7 +617,7 @@ writeFileSync(
   join(OUT, 'llms.txt'),
   `# Steff Cloud — Digital Marketing Agency, Nakuru, Kenya
 
-> ${site.legalName} (${site.chineseName}) is a digital marketing agency founded in ${site.founded} and based on ${site.address.street}, Nakuru, Kenya. It serves businesses across Kenya with SEO, GEO (generative engine / AI search optimization), local SEO and Google Business Profile, social media management, Google/Meta/TikTok ads, content and short-form video, WhatsApp/email/SMS marketing, and analytics & conversion optimization. Plans start at KES 8,000 per month. Contact: ${site.phone} (call/WhatsApp), ${site.email}.
+> ${site.legalName} (${site.japaneseName}) is a digital marketing agency founded in ${site.founded} and based on ${site.address.street}, Nakuru, Kenya. It serves businesses across Kenya with SEO, GEO (generative engine / AI search optimization), local SEO and Google Business Profile, social media management, Google/Meta/TikTok ads, content and short-form video, WhatsApp/email/SMS marketing, and analytics & conversion optimization. Plans start at KES 8,000 per month. Contact: ${site.phone} (call/WhatsApp), ${site.email}.
 
 ## Key facts
 - Legal name: ${site.legalName}
@@ -635,6 +642,13 @@ ${services.map((s) => `- [${s.name}](${abs(`/services/${s.slug}/`)}): ${s.hook} 
 - [Contact](${abs('/contact/')})
 - [FAQ](${abs('/faq/')})
 - [Privacy Policy](${abs('/privacy-policy/')}) · [Terms](${abs('/terms/')}) · [Legal Notice](${abs('/legal-notice/')})
+
+## Industries
+${industries.map((i) => `- [Digital marketing for ${i.name}](${abs(`/industries/${i.slug}/`)}): ${i.hook}`).join('\n')}
+
+## Free tools and course
+- [Steff Cloud Academy: free digital marketing course](${abs('/academy/')})
+${tools.map((t) => `- [${t.name}](${abs(`/tools/${t.slug}/`)}): ${t.hook}`).join('\n')}
 
 ## Guides
 ${sortedPosts.map((p) => `- [${p.title}](${abs(`/blog/${p.slug}/`)}): ${p.tldr}`).join('\n')}

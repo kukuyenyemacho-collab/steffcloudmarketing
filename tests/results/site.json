@@ -1,40 +1,42 @@
 {
-  "date": "2026-10-04T19:27:09.896Z",
-  "pages": 36,
+  "date": "2026-10-04T19:43:41.198Z",
+  "pages": 51,
   "viewports": [
     "phone 360px (dark)",
     "tablet 768px (light)",
     "desktop 1440px (light)"
   ],
-  "checks": 1364,
+  "checks": 1923,
   "failures": [],
-  "warnings": [],
+  "warnings": [
+    "/tools/whatsapp-link-generator/: description 166 chars (may be truncated in Google)"
+  ],
   "heaviestPages": [
     {
       "path": "/digital-marketing-agency-nakuru/",
-      "kb": 30,
-      "loadMs": 62
+      "kb": 63,
+      "loadMs": 56
     },
     {
-      "path": "/learn/digital-marketing-glossary/",
-      "kb": 30,
-      "loadMs": 42
-    },
-    {
-      "path": "/cookie-policy/",
-      "kb": 30,
+      "path": "/faq/",
+      "kb": 63,
       "loadMs": 39
     },
     {
-      "path": "/",
-      "kb": 23,
-      "loadMs": 171
+      "path": "/blog/how-to-choose-digital-marketing-agency-nakuru/",
+      "kb": 63,
+      "loadMs": 46
     },
     {
-      "path": "/services/",
-      "kb": 21,
-      "loadMs": 43
+      "path": "/privacy-policy/",
+      "kb": 63,
+      "loadMs": 36
+    },
+    {
+      "path": "/industries/healthcare-clinics/",
+      "kb": 63,
+      "loadMs": 53
     }
   ],
-  "averagePageKB": 22
+  "averagePageKB": 28
 }

@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { site, services, nav } from './data.js';
+import { industries, tools } from './growth.js';
 
 export const esc = (s = '') =>
   String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -60,7 +61,7 @@ export function orgSchema() {
     '@id': orgId,
     name: site.name,
     legalName: site.legalName,
-    alternateName: [site.legalName, site.chineseName, 'Steff Cloud Digital Marketing'],
+    alternateName: [site.legalName, site.japaneseName, 'Steff Cloud Digital Marketing'],
     description:
       'Steff Cloud Limited is a digital marketing agency in Nakuru, Kenya serving clients across Kenya, East Africa and internationally. Services: SEO, GEO (AI search optimization), local SEO, social media management, Google, Meta & TikTok ads, content and video, WhatsApp/email marketing and analytics.',
     slogan: site.tagline,
@@ -189,7 +190,7 @@ export function mapEmbed(wide = false) {
 export function ctaBand({ title = 'Ready to be impossible to ignore?', text = 'Book a free 30-minute growth audit. Walk away with a clear plan, whether you hire us or not.' } = {}) {
   return `<section class="cta-band"><div class="wrap">
   <h2>${title}</h2><p>${esc(text)}</p>
-  <div class="btns"><a class="btn btn-inv" href="/free-audit/">Get my free audit ${icon('arrow')}</a>
+  <div class="btns"><a class="btn btn-accent" href="/free-audit/">Get my free audit ${icon('arrow')}</a>
   <a class="btn btn-inv-line" href="${wa('Hi Steff Cloud, I would like to grow my business with digital marketing.')}" target="_blank" rel="noopener" data-track="whatsapp">${waIcon}<span>WhatsApp us</span></a></div>
 </div></section>`;
 }
@@ -223,14 +224,23 @@ export function currencySelect(id) {
 const brandMark = (cls = '') => `<span class="brand-mark ${cls}" role="img" aria-label="Steff Cloud"></span>`;
 
 function header(current) {
-  const svcLinks = services
-    .map((s) => `<li><a href="/services/${s.slug}/">${icon(s.icon)}<span><b>${esc(s.short)}</b><small>${esc(s.hook)}</small></span></a></li>`)
-    .join('');
+  const item = (href, ic, title, sub) => `<li><a href="${href}">${icon(ic)}<span><b>${esc(title)}</b><small>${esc(sub)}</small></span></a></li>`;
+  const megas = {
+    services: services.map((s) => item(`/services/${s.slug}/`, s.icon, s.short, s.hook)).join(''),
+    industries: industries.map((i) => item(`/industries/${i.slug}/`, i.icon, i.name, i.hook)).join(''),
+    resources: [
+      item('/academy/', 'spark', 'Free Academy course', 'Learn digital marketing in 5 modules, free'),
+      item('/blog/', 'chat', 'Blog & guides', 'Practical lessons for Kenyan businesses'),
+      ...tools.map((t) => item(`/tools/${t.slug}/`, t.icon, t.name, t.hook)),
+      item('/learn/digital-marketing-glossary/', 'search', 'Glossary', '44 marketing terms explained simply'),
+      item('/digital-marketing-agency-nakuru/', 'pin', 'Nakuru agency', 'Why Nakuru businesses grow with us'),
+    ].join(''),
+  };
   const links = nav
     .map((n) => {
       const active = current && current !== '/' && current.startsWith(n.href) ? ' aria-current="page"' : '';
-      if (n.children)
-        return `<li class="has-mega"><a href="${n.href}"${active}>${n.label}</a><div class="mega"><ul>${svcLinks}</ul></div></li>`;
+      if (n.mega)
+        return `<li class="has-mega"><a href="${n.href}"${active}>${n.label}</a><div class="mega"><ul>${megas[n.mega]}</ul></div></li>`;
       return `<li><a href="${n.href}"${active}>${n.label}</a></li>`;
     })
     .join('');
@@ -240,13 +250,13 @@ function header(current) {
   <nav class="main-nav" aria-label="Main"><ul>${links}</ul></nav>
   <div class="hdr-cta">
     <button class="icon-btn theme-btn" type="button" aria-label="Switch to dark theme">${icon('moon', 'i-moon')}${icon('sun', 'i-sun')}</button>
-    <a class="btn btn-solid btn-sm hdr-audit" href="/free-audit/">Free audit ${icon('arrow')}</a>
+    <a class="btn btn-accent btn-sm hdr-audit" href="/free-audit/">Free audit ${icon('arrow')}</a>
     <button class="icon-btn menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav">${icon('menu')}</button>
   </div>
 </div>
-<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile" hidden><ul>${nav.map((n) => `<li><a href="${n.href}">${n.label}</a></li>`).join('')}${services
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile" hidden><ul>${nav.map((n) => `<li><a href="${n.href}">${n.label}</a></li>`).join('')}<li><a href="/academy/">Free Academy</a></li><li><a href="/tools/">Free tools</a></li>${services
     .map((s) => `<li class="sub"><a href="/services/${s.slug}/">${esc(s.short)}</a></li>`)
-    .join('')}</ul><a class="btn btn-solid btn-block" href="/free-audit/">Get my free audit</a></nav>
+    .join('')}</ul><a class="btn btn-accent btn-block" href="/free-audit/">Get my free audit</a></nav>
 </header>`;
 }
 
@@ -268,6 +278,9 @@ function cookieUi() {
 </dialog>`;
 }
 
+// One-line footer name, sized so the text fills the width with the logo's full stop in orange.
+const FNAME_H = 54, FNAME_Y = 51, FNAME_DOT = 8, FNAME_W = 1000 - FNAME_DOT * 2 - 8;
+
 function footer() {
   const col = (title, items) =>
     `<div class="f-col"><p class="f-h">${title}</p><ul>${items.map(([n, h]) => `<li><a href="${h}">${esc(n)}</a></li>`).join('')}</ul></div>`;
@@ -277,6 +290,7 @@ function footer() {
   return `<footer class="site-footer">
 <div class="wrap">
   <div class="f-top">
+    <div class="f-grid">
     <div class="f-brand">
       <span class="logo-mark" role="img" aria-label="Steff Cloud, Creative Agency, established 2026"></span>
       <p>Digital marketing that brings real clients, not just likes. Based in Nakuru, serving Kenya and the world.</p>
@@ -289,19 +303,18 @@ function footer() {
       </ul>${socials}
     </div>
     ${col('Services', services.map((s) => [s.short, `/services/${s.slug}/`]))}
+    ${col('Industries', industries.map((i) => [i.name, `/industries/${i.slug}/`]))}
     ${col('Company', [['About', '/about/'], ['Pricing', '/pricing/'], ['Nakuru agency', '/digital-marketing-agency-nakuru/'], ['International clients', '/international/'], ['Free audit', '/free-audit/'], ['Contact', '/contact/'], ['FAQ', '/faq/'], ['Steff Cloud main site', site.mainSite]])}
-    ${col('Learn', [['Blog', '/blog/'], ['Glossary', '/learn/digital-marketing-glossary/'], ['What is GEO?', '/blog/what-is-geo-generative-engine-optimization/'], ['Marketing in Kenya', '/blog/digital-marketing-in-kenya-guide/'], ['Rank on Google Maps', '/blog/google-business-profile-nakuru-guide/']])}
+    ${col('Resources', [['Free Academy', '/academy/'], ['Free tools', '/tools/'], ['Marketing grader', '/tools/marketing-grader/'], ['WhatsApp link generator', '/tools/whatsapp-link-generator/'], ['Blog', '/blog/'], ['Glossary', '/learn/digital-marketing-glossary/']])}
     <div class="f-col"><p class="f-h">Legal</p><ul>${[['Privacy Policy', '/privacy-policy/'], ['Terms of Service', '/terms/'], ['Cookie Policy', '/cookie-policy/'], ['Refund Policy', '/refund-policy/'], ['Disclaimer', '/disclaimer/'], ['Accessibility', '/accessibility/'], ['Legal Notice', '/legal-notice/']]
       .map(([n, h]) => `<li><a href="${h}">${n}</a></li>`)
       .join('')}<li><button class="link-btn inv" type="button" data-open-cookies>Cookie settings</button></li></ul></div>
+    </div>
+    <p class="f-jp" lang="ja" aria-label="${esc(site.japaneseName)}: Steff Cloud in Japanese">${site.japaneseName}</p>
   </div>
-  <div class="f-mark">
-    <svg class="f-name" viewBox="0 0 1000 300" role="img" aria-label="${esc(site.legalName.toUpperCase())}">
-      <text x="0" y="138" textLength="1000" lengthAdjust="spacingAndGlyphs">STEFF CLOUD</text>
-      <text x="0" y="292" textLength="1000" lengthAdjust="spacing">LIMITED</text>
-    </svg>
-    <p class="f-cn" lang="zh-Hans" aria-label="${esc(site.chineseName)}, Steff Cloud in Chinese">${site.chineseName}</p>
-  </div>
+  <svg class="f-name" viewBox="0 0 1000 ${FNAME_H}" role="img" aria-label="${esc(site.legalName.toUpperCase())}">
+    <text x="0" y="${FNAME_Y}" textLength="${FNAME_W}" lengthAdjust="spacingAndGlyphs">STEFF CLOUD LIMITED</text><circle class="f-dot" cx="${1000 - FNAME_DOT}" cy="${FNAME_Y - FNAME_DOT}" r="${FNAME_DOT}"/>
+  </svg>
   <div class="f-bottom"><p>© ${new Date().getFullYear()} ${esc(site.legalName)}. All rights reserved.</p>${currencySelect('cur-footer')}<p>Made with intent in Nakuru, Kenya</p></div>
 </div>
 </footer>

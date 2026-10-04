@@ -232,6 +232,98 @@
     run();
   }
 
+  // ---------- Digital marketing grader ----------
+  const grader = $('#grader');
+  if (grader) {
+    let tips = {};
+    try { tips = JSON.parse($('#grader-tips').textContent); } catch {}
+    const qs = $$('.g-q', grader);
+    const g = (k) => $(`[data-g="${k}"]`);
+    const cta = $('.g-cta');
+    const grade = (n) => (n >= 80 ? 'Market leader. Keep compounding.' : n >= 60 ? 'Strong, with a few costly gaps.' : n >= 40 ? 'Getting there. Customers still miss you.' : 'Mostly invisible online. Big upside ahead.');
+    const run = () => {
+      let score = 0, answered = 0;
+      const gaps = [];
+      qs.forEach((q) => {
+        const w = +q.dataset.weight;
+        const v = $('input:checked', q);
+        if (v) { answered++; score += w * +v.value; }
+        if (!v || +v.value < 1) gaps.push({ id: q.dataset.id, lost: w * (1 - (v ? +v.value : 0)), answered: !!v });
+      });
+      score = Math.round(score);
+      g('score').textContent = String(score);
+      g('bar').style.width = score + '%';
+      g('count').textContent = `${answered} of ${qs.length} answered`;
+      g('grade').textContent = answered ? grade(score) + (answered < qs.length ? ' (so far)' : '') : 'Answer the questions to see your grade.';
+      const top = gaps.filter((x) => x.answered).sort((a, b) => b.lost - a.lost).slice(0, 3);
+      const fx = $('.g-fixes');
+      fx.hidden = top.length === 0;
+      g('fixes').replaceChildren(...top.map((t) => { const li = document.createElement('li'); li.textContent = tips[t.id] || ''; return li; }));
+      cta.href = waUrl(`Hi Steff Cloud, I scored ${score}/100 on your Digital Marketing Grader (${answered}/${qs.length} answered). Can you help me improve it?`);
+      try { sessionStorage.setItem('sc-grader', JSON.stringify(Object.fromEntries(qs.map((q) => [q.dataset.id, $('input:checked', q)?.value ?? null])))); } catch {}
+    };
+    try {
+      const saved = JSON.parse(sessionStorage.getItem('sc-grader') || '{}');
+      Object.entries(saved).forEach(([id, v]) => { if (v !== null) { const i = $(`input[name="${id}"][value="${v}"]`, grader); if (i) i.checked = true; } });
+    } catch {}
+    grader.addEventListener('change', run);
+    grader.addEventListener('submit', (e) => e.preventDefault());
+    run();
+  }
+
+  // ---------- WhatsApp link generator ----------
+  const wl = $('#walink');
+  if (wl) {
+    const out = $('#wl-out'), err = $('.wl-error', wl), test = $('[data-wl="test"]', wl), copyBtn = $('[data-wl="copy"]', wl);
+    const toIntl = (raw) => {
+      const p = normPhone(raw).replace(/^\+/, '');
+      if (/^0[17]\d{8}$/.test(p)) return '254' + p.slice(1);
+      if (/^254[17]\d{8}$/.test(p)) return p;
+      if (/^[1-9]\d{7,14}$/.test(p) && normPhone(raw).startsWith('+')) return p;
+      return null;
+    };
+    const run = () => {
+      const n = toIntl(wl.phone.value);
+      if (!n) { err.textContent = 'Enter a Kenyan number like 0712 345 678, or an international number starting with +.'; out.value = ''; test.removeAttribute('href'); return; }
+      err.textContent = '';
+      const msg = wl.message.value.trim();
+      out.value = `https://wa.me/${n}` + (msg ? `?text=${encodeURIComponent(msg)}` : '');
+      test.href = out.value;
+    };
+    wl.addEventListener('input', run);
+    wl.addEventListener('submit', (e) => e.preventDefault());
+    copyBtn.addEventListener('click', async () => {
+      const label = $('span', copyBtn);
+      if (!out.value) return;
+      try { await navigator.clipboard.writeText(out.value); label.textContent = 'Copied'; }
+      catch { out.select(); label.textContent = 'Press Ctrl+C to copy'; }
+      setTimeout(() => { label.textContent = 'Copy link'; }, 2200);
+    });
+    run();
+  }
+
+  // ---------- Academy progress (saved on this device) ----------
+  const lessonBoxes = $$('input[data-lesson]');
+  if (lessonBoxes.length) {
+    let done = {};
+    try { done = JSON.parse(store.get('sc-academy') || '{}'); } catch {}
+    const sync = () => {
+      const n = lessonBoxes.filter((b) => b.checked).length;
+      const pct = Math.round((n / lessonBoxes.length) * 100);
+      $('[data-ac="pct"]').textContent = String(pct);
+      $('[data-ac="bar"]').style.width = pct + '%';
+      $('[data-ac="label"]').textContent = n === lessonBoxes.length
+        ? `All ${n} lessons done. Well done! Put it to work, or ask us for a free audit.`
+        : `${n} of ${lessonBoxes.length} lessons done. Progress is saved on this device.`;
+      lessonBoxes.forEach((b) => b.closest('li').classList.toggle('done', b.checked));
+    };
+    lessonBoxes.forEach((b) => {
+      b.checked = !!done[b.dataset.lesson];
+      b.addEventListener('change', () => { done[b.dataset.lesson] = b.checked; store.set('sc-academy', JSON.stringify(done)); sync(); });
+    });
+    sync();
+  }
+
   // ---------- Blog filter ----------
   const grid = $('#post-grid');
   $$('.chip-btn[data-filter]').forEach((b) => {
@@ -287,7 +379,7 @@
         el.classList.toggle('is-open', open);
         $('.os-text', el).textContent = open
           ? `Open now · ${parts.hour}:${parts.minute} in Nakuru`
-          : 'Closed now · opens 8am EAT · WhatsApp us anytime';
+          : 'Closed now · opens 8am EAT';
       });
     };
     update();

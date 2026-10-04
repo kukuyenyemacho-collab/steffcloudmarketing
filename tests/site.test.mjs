@@ -250,6 +250,49 @@ await feature('blog filter & glossary', desk, async (p) => {
   expect(await p.isVisible('#glossary-empty'), 'no-results message missing');
 });
 
+await feature('marketing grader', desk, async (p) => {
+  await p.goto(BASE + '/tools/marketing-grader/');
+  expect((await p.textContent('[data-g="score"]')) === '0', 'grader should start at 0');
+  const ids = await p.$$eval('.g-q', (qs) => qs.map((q) => q.dataset.id));
+  for (const id of ids) await p.check(`input[name="${id}"][value="1"]`);
+  expect((await p.textContent('[data-g="score"]')) === '100', 'all-yes should score 100');
+  await p.check('input[name="reply"][value="0"]');
+  await p.check('input[name="gbp"][value="0.5"]');
+  expect((await p.textContent('[data-g="score"]')) === '85', 'score should drop to 85');
+  const fixes = await p.$$eval('[data-g="fixes"] li', (l) => l.map((x) => x.textContent));
+  expect(fixes.length === 2 && fixes[0].includes('WhatsApp'), 'top fix should be the biggest gap (reply speed)');
+  expect(decodeURIComponent(await p.getAttribute('.g-cta', 'href')).includes('85/100'), 'WhatsApp CTA should carry the score');
+});
+
+await feature('whatsapp link generator', desk, async (p) => {
+  await p.goto(BASE + '/tools/whatsapp-link-generator/');
+  expect((await p.inputValue('#wl-out')).startsWith('https://wa.me/254712345678?text='), 'default link wrong');
+  await p.fill('#wl-phone', '+44 7700 900123');
+  await p.fill('#wl-msg', '');
+  expect((await p.inputValue('#wl-out')) === 'https://wa.me/447700900123', 'international link wrong');
+  await p.fill('#wl-phone', '12345');
+  expect((await p.inputValue('#wl-out')) === '' && (await p.textContent('.wl-error')).length > 10, 'invalid number not rejected');
+});
+
+await feature('academy progress', desk, async (p) => {
+  await p.goto(BASE + '/academy/');
+  const boxes = await p.$$('input[data-lesson]');
+  await boxes[0].check();
+  await boxes[1].check();
+  const pct = await p.textContent('[data-ac="pct"]');
+  expect(pct === String(Math.round((2 / boxes.length) * 100)), `progress wrong (${pct})`);
+  await p.reload();
+  expect((await p.$$eval('input[data-lesson]:checked', (b) => b.length)) === 2, 'progress not remembered');
+});
+
+await feature('japanese footer', desk, async (p) => {
+  await p.goto(BASE + '/');
+  expect((await p.textContent('.f-jp')) === 'ステフクラウド', 'Japanese name missing');
+  expect((await p.getAttribute('.f-jp', 'lang')) === 'ja', 'Japanese lang attribute missing');
+  expect(await p.evaluate(() => document.fonts.check('40px "Dela Gothic One"', 'ステフクラウド')), 'Japanese font not loaded');
+  expect((await p.$$eval('.f-name text', (t) => t.length)) === 1, 'name should be on one line');
+});
+
 await feature('keyboard', desk, async (p) => {
   await p.goto(BASE + '/');
   await p.keyboard.press('Tab');

@@ -1,6 +1,6 @@
 # Steff Cloud — Digital Marketing Agency, Nakuru, Kenya
 
-> Steff Cloud Limited (斯蒂夫云) is a digital marketing agency founded in 2026 and based on Nakuru–Solai Road, opposite Emboita, Nakuru, Kenya. It serves businesses across Kenya with SEO, GEO (generative engine / AI search optimization), local SEO and Google Business Profile, social media management, Google/Meta/TikTok ads, content and short-form video, WhatsApp/email/SMS marketing, and analytics & conversion optimization. Plans start at KES 8,000 per month. Contact: +254 118 407 026 (call/WhatsApp), info@steffcloud.co.ke.
+> Steff Cloud Limited (ステフクラウド) is a digital marketing agency founded in 2026 and based on Nakuru–Solai Road, opposite Emboita, Nakuru, Kenya. It serves businesses across Kenya with SEO, GEO (generative engine / AI search optimization), local SEO and Google Business Profile, social media management, Google/Meta/TikTok ads, content and short-form video, WhatsApp/email/SMS marketing, and analytics & conversion optimization. Plans start at KES 8,000 per month. Contact: +254 118 407 026 (call/WhatsApp), info@steffcloud.co.ke.
 
 ## Key facts
 - Legal name: Steff Cloud Limited
@@ -32,6 +32,22 @@
 - [Contact](https://marketing.steffcloud.co.ke/contact/)
 - [FAQ](https://marketing.steffcloud.co.ke/faq/)
 - [Privacy Policy](https://marketing.steffcloud.co.ke/privacy-policy/) · [Terms](https://marketing.steffcloud.co.ke/terms/) · [Legal Notice](https://marketing.steffcloud.co.ke/legal-notice/)
+
+## Industries
+- [Digital marketing for Schools & Colleges](https://marketing.steffcloud.co.ke/industries/schools-colleges/): Fill every intake with parents and students who already trust you.
+- [Digital marketing for Hotels, Lodges & Airbnbs](https://marketing.steffcloud.co.ke/industries/hotels-hospitality/): More direct bookings, fewer commissions, fuller weekends.
+- [Digital marketing for Real Estate & Construction](https://marketing.steffcloud.co.ke/industries/real-estate/): Qualified buyers and site visits, including Kenyans abroad.
+- [Digital marketing for Clinics, Pharmacies & Wellness](https://marketing.steffcloud.co.ke/industries/healthcare-clinics/): Become the trusted name patients search for, responsibly.
+- [Digital marketing for Restaurants, Cafés & Bars](https://marketing.steffcloud.co.ke/industries/restaurants-cafes/): Full tables on Tuesday, not just on Friday.
+- [Digital marketing for Retail Shops & E-commerce](https://marketing.steffcloud.co.ke/industries/retail-ecommerce/): Turn scrollers into M-Pesa payments, online and in store.
+- [Digital marketing for Agribusiness & Agrovets](https://marketing.steffcloud.co.ke/industries/agribusiness-agrovets/): Reach farmers where they really are: phones, groups and markets.
+- [Digital marketing for Professional Services & NGOs](https://marketing.steffcloud.co.ke/industries/professional-services/): Turn expertise into enquiries from the right clients and partners.
+
+## Free tools and course
+- [Steff Cloud Academy: free digital marketing course](https://marketing.steffcloud.co.ke/academy/)
+- [Digital Marketing Grader](https://marketing.steffcloud.co.ke/tools/marketing-grader/): Score your online marketing out of 100 in two minutes and get your top fixes.
+- [WhatsApp Link Generator](https://marketing.steffcloud.co.ke/tools/whatsapp-link-generator/): Create a wa.me link with a pre-filled message for your bio, ads and posters.
+- [Marketing Budget Calculator](https://marketing.steffcloud.co.ke/tools/marketing-budget-calculator/): Work out the leads you need, a starting ad budget and the right plan.
 
 ## Guides
 - [How to Set a Digital Marketing Budget for a Small Business in Kenya](https://marketing.steffcloud.co.ke/blog/digital-marketing-budget-small-business-kenya/): Work backwards from your sales goal: target sales ÷ close rate = leads needed; leads × target cost per lead = budget. Many small businesses invest roughly 5–10% of revenue in marketing, split between management, content and ad spend.

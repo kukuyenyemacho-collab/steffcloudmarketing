@@ -1,6 +1,6 @@
 Contact: mailto:info@steffcloud.co.ke
 Contact: tel:+254118407026
-Expires: 2027-10-04T19:25:43Z
+Expires: 2027-10-04T19:43:52Z
 Preferred-Languages: en, sw
 Canonical: https://marketing.steffcloud.co.ke/.well-known/security.txt
 Policy: https://marketing.steffcloud.co.ke/legal-notice/#security
