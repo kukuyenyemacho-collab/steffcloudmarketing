@@ -1,0 +1,5 @@
+{
+  "buildCommand": "node src/build.js",
+  "outputDirectory": "public",
+  "trailingSlash": true
+}

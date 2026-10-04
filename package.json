@@ -1,0 +1,11 @@
+{
+  "name": "steffcloud-marketing",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Steff Cloud Limited — digital marketing website (static, SEO/GEO-optimised).",
+  "type": "module",
+  "scripts": {
+    "build": "node src/build.js",
+    "serve": "npx --yes serve public -l 4173"
+  }
+}
