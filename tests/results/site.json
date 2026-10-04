@@ -1,0 +1,40 @@
+{
+  "date": "2026-10-04T19:27:09.896Z",
+  "pages": 36,
+  "viewports": [
+    "phone 360px (dark)",
+    "tablet 768px (light)",
+    "desktop 1440px (light)"
+  ],
+  "checks": 1364,
+  "failures": [],
+  "warnings": [],
+  "heaviestPages": [
+    {
+      "path": "/digital-marketing-agency-nakuru/",
+      "kb": 30,
+      "loadMs": 62
+    },
+    {
+      "path": "/learn/digital-marketing-glossary/",
+      "kb": 30,
+      "loadMs": 42
+    },
+    {
+      "path": "/cookie-policy/",
+      "kb": 30,
+      "loadMs": 39
+    },
+    {
+      "path": "/",
+      "kb": 23,
+      "loadMs": 171
+    },
+    {
+      "path": "/services/",
+      "kb": 21,
+      "loadMs": 43
+    }
+  ],
+  "averagePageKB": 22
+}

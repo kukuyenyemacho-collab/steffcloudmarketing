@@ -1,0 +1,22 @@
+{
+  "connections": 200,
+  "durationSeconds": 20,
+  "urls": 40,
+  "requests": 148897,
+  "requestsPerSecond": 7439,
+  "latencyMs": {
+    "p50": 26.3,
+    "p90": 29.5,
+    "p99": 113.4,
+    "max": 1135.2
+  },
+  "ok": 148897,
+  "non2xx": 0,
+  "errors": 0,
+  "megabytesServed": 1395,
+  "burst": {
+    "requests": 2000,
+    "totalMs": 275,
+    "completed": 2000
+  }
+}

@@ -70,7 +70,7 @@ export const posts = [
     slug: 'what-is-geo-generative-engine-optimization',
     title: 'What Is GEO (Generative Engine Optimization)? How to Get Recommended by ChatGPT & Google AI',
     description:
-      'GEO explained for Kenyan businesses: what Generative Engine Optimization is, how it differs from SEO, and 9 steps to get your business cited by ChatGPT, Gemini, Perplexity and AI Overviews.',
+      'GEO explained for Kenyan businesses: what Generative Engine Optimization is, how it differs from SEO, and 9 steps to get cited by ChatGPT and Google AI.',
     category: 'GEO & AI Search',
     date: '2026-09-10',
     minutes: 9,
@@ -83,7 +83,7 @@ export const posts = [
 
 <h2>SEO vs GEO: what is the difference?</h2>
 <table>
-  <thead><tr><th></th><th>SEO</th><th>GEO</th></tr></thead>
+  <thead><tr><th>Aspect</th><th>SEO</th><th>GEO</th></tr></thead>
   <tbody>
     <tr><td>Goal</td><td>Rank in search results</td><td>Be mentioned or cited in AI answers</td></tr>
     <tr><td>Main unit</td><td>Web page</td><td>Facts about your brand (entity)</td></tr>

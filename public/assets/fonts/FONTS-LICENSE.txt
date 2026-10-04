@@ -1,0 +1,5 @@
+Self-hosted font files in this folder:
+- Unbounded (c) The Unbounded Project Authors — SIL Open Font License 1.1
+- Inter (c) The Inter Project Authors — SIL Open Font License 1.1
+- Noto Serif SC (c) Google LLC / Adobe — SIL Open Font License 1.1 (subset: 斯蒂夫云)
+Full licence text: https://openfontlicense.org

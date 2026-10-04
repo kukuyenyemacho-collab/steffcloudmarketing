@@ -24,15 +24,36 @@ export const site = {
   geo: { lat: -0.3031, lng: 36.08 },
   hours: 'Mo-Sa 08:00-18:00',
   hoursText: 'Mon – Sat, 8:00am – 6:00pm (WhatsApp replies 7 days)',
-  areaServed: ['Nakuru', 'Naivasha', 'Nyahururu', 'Molo', 'Njoro', 'Gilgil', 'Eldoret', 'Kericho', 'Nairobi', 'Kenya'],
+  areaServed: ['Nakuru', 'Naivasha', 'Nyahururu', 'Molo', 'Njoro', 'Gilgil', 'Eldoret', 'Kericho', 'Nairobi', 'Kenya', 'East Africa', 'Worldwide'],
   // Add your profile URLs here; they power the footer icons and schema "sameAs".
   socials: [
     // { label: 'Instagram', url: 'https://instagram.com/...' },
   ],
   // Optional: a Formspree/Getform/Web3Forms endpoint. Empty = leads go straight to WhatsApp.
+  // Its origin is added to the Content-Security-Policy automatically.
   formEndpoint: '',
-  // Optional: Google Analytics 4 measurement ID, e.g. 'G-XXXXXXX'. Empty = no analytics loaded.
+  // Optional: Google Analytics 4 measurement ID, e.g. 'G-XXXXXXX'. Loads only after analytics consent.
   ga4: '',
+  // Optional: Meta (Facebook) Pixel ID. Loads only after marketing consent.
+  metaPixel: '',
+  // Company identifiers shown on the Legal Notice page. Leave empty to hide a line.
+  legalIds: {
+    registrationNo: '', // Registrar of Companies (BRS) number, e.g. 'PVT-XXXXXXX'
+    kraPin: '',
+    vatNo: '',
+    odpcRegNo: '', // Office of the Data Protection Commissioner registration
+  },
+  timezone: 'Africa/Nairobi',
+  timezoneLabel: 'EAT (UTC+3)',
+  languages: ['English', 'Swahili'],
+  // Approximate display rates for international visitors (KES per 1 unit). Invoices are issued in KES or USD.
+  // Update these occasionally; the site always labels converted prices as approximate.
+  currencies: {
+    KES: { symbol: 'KES ', rate: 1 },
+    USD: { symbol: 'US$', rate: 129 },
+    EUR: { symbol: '€', rate: 151 },
+    GBP: { symbol: '£', rate: 174 },
+  },
   topbar: {
     text: 'Free 30-minute growth audit for Kenyan businesses this month',
     cta: 'Claim yours',
@@ -109,7 +130,7 @@ export const services = [
     hook: 'Be the business ChatGPT, Gemini and Google AI Overviews recommend.',
     title: 'GEO Agency Kenya — Get Recommended by ChatGPT | Steff Cloud',
     description:
-      'Generative Engine Optimization (GEO) in Kenya. Get your business cited by ChatGPT, Google AI Overviews, Gemini, Perplexity and Copilot. GEO strategy built for Kenyan businesses.',
+      'Generative Engine Optimization (GEO) in Kenya: get your business cited by ChatGPT, Google AI Overviews, Gemini, Perplexity and Copilot.',
     intro:
       'Your customers now ask AI: “Which is the best digital marketing agency in Nakuru?” or “Where can I buy solar panels in Nakuru?” AI assistants answer with a few names. Generative Engine Optimization (GEO) is the discipline of making sure one of those names is yours — through structured data, citable content, brand mentions and entity building.',
     deliverables: [
@@ -137,7 +158,7 @@ export const services = [
     hook: 'Consistent content and community growth — without you lifting a finger.',
     title: 'Social Media Management Nakuru — From KES 8,000 | Steff Cloud',
     description:
-      'Social media management in Nakuru from KES 8,000/month. Content planning, design, short video, captions, posting and community management on Instagram, TikTok, Facebook & LinkedIn.',
+      'Social media management in Nakuru from KES 8,000/month: content plans, design, short video, captions, posting and replies on Instagram, TikTok & Facebook.',
     intro:
       'Posting “when we have time” does not build a brand. We plan, design, shoot, write, post and reply — every week — so your pages look like the leader in your category and turn followers into DMs, calls and orders.',
     deliverables: [
@@ -165,7 +186,7 @@ export const services = [
     hook: 'Ads that bring paying customers — tracked to the last shilling.',
     title: 'Google Ads, Facebook & TikTok Ads Agency Kenya — PPC Management | Steff Cloud',
     description:
-      'Paid ads management in Kenya: Google Search, Performance Max, YouTube, Facebook, Instagram and TikTok ads. Conversion tracking, creative testing and weekly optimisation.',
+      'Google, YouTube, Facebook, Instagram and TikTok ads management in Kenya, with conversion tracking, creative testing and weekly optimisation.',
     intro:
       'Boosting posts is not a strategy. We build full-funnel campaigns on Google, Meta and TikTok with proper conversion tracking, tested creatives and landing pages built to convert — then optimise weekly so every shilling works harder.',
     deliverables: [
@@ -353,6 +374,7 @@ export const nav = [
   { label: 'Pricing', href: '/pricing/' },
   { label: 'Nakuru', href: '/digital-marketing-agency-nakuru/' },
   { label: 'Learn', href: '/blog/' },
+  { label: 'Global', href: '/international/' },
   { label: 'About', href: '/about/' },
   { label: 'Contact', href: '/contact/' },
 ];

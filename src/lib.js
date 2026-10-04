@@ -1,11 +1,15 @@
+import { createHash } from 'node:crypto';
 import { site, services, nav } from './data.js';
 
 export const esc = (s = '') =>
   String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 export const kes = (n) => 'KES ' + Number(n).toLocaleString('en-KE');
+// Price that the currency switcher can convert in the browser. Falls back to KES text.
+export const money = (n) => `<span class="money" data-kes="${n}">${kes(n)}</span>`;
 export const abs = (p) => site.url + p;
 export const wa = (text) => `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(text)}`;
+export const mapsLink = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('Emboita, Nakuru–Solai Road, Nakuru, Kenya');
 
 const ICONS = {
   search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
@@ -24,16 +28,32 @@ const ICONS = {
   clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
   menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
+  globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+  shield: '<path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6z"/><path d="m9 12 2 2 4-4"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  moon: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
+  copy: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',
+  cookie: '<path d="M12 3a9 9 0 1 0 9 9 3 3 0 0 1-3-3 3 3 0 0 1-3-3 3 3 0 0 1-3-3z"/><circle cx="8.5" cy="10.5" r=".8"/><circle cx="14" cy="15" r=".8"/><circle cx="9" cy="15.5" r=".8"/>',
+  calc: '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h2M12 11h2M16 11h0M8 15h2M12 15h2M8 18h2M12 18h4"/>',
 };
 export const icon = (name, cls = '') =>
   `<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name] || ''}</svg>`;
 
 export const waIcon = `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.4.8 3.2.6a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.2-.2-.5-.3z"/></svg>`;
 
+// The only inline script on the site: applies a saved theme before first paint.
+// Its hash is added to the Content-Security-Policy so no 'unsafe-inline' is needed.
+export const themeBoot = "try{var t=localStorage.getItem('sc-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}";
+export const themeBootHash = 'sha256-' + createHash('sha256').update(themeBoot).digest('base64');
+
+// Set by build.js after minifying, so HTML references cache-busted assets.
+export const assetVersion = { css: '1', js: '1' };
+
 // ---------- JSON-LD ----------
 export const orgId = site.url + '/#org';
 
 export function orgSchema() {
+  const ids = site.legalIds || {};
   return {
     '@context': 'https://schema.org',
     '@type': 'ProfessionalService',
@@ -42,7 +62,7 @@ export function orgSchema() {
     legalName: site.legalName,
     alternateName: [site.legalName, site.chineseName, 'Steff Cloud Digital Marketing'],
     description:
-      'Steff Cloud Limited is a digital marketing agency in Nakuru, Kenya offering SEO, GEO (AI search optimization), local SEO, social media management, Google, Meta & TikTok ads, content and video, WhatsApp/email marketing and analytics.',
+      'Steff Cloud Limited is a digital marketing agency in Nakuru, Kenya serving clients across Kenya, East Africa and internationally. Services: SEO, GEO (AI search optimization), local SEO, social media management, Google, Meta & TikTok ads, content and video, WhatsApp/email marketing and analytics.',
     slogan: site.tagline,
     url: site.url + '/',
     logo: abs('/assets/img/logo-black.png'),
@@ -50,8 +70,11 @@ export function orgSchema() {
     telephone: site.phoneE164,
     email: site.email,
     foundingDate: site.founded,
+    ...(ids.registrationNo ? { identifier: ids.registrationNo } : {}),
+    ...(ids.vatNo ? { vatID: ids.vatNo } : {}),
+    ...(ids.kraPin ? { taxID: ids.kraPin } : {}),
     priceRange: 'KES 8,000 – KES 60,000+ per month',
-    currenciesAccepted: 'KES',
+    currenciesAccepted: 'KES, USD',
     paymentAccepted: 'M-Pesa, Bank transfer, Card',
     address: {
       '@type': 'PostalAddress',
@@ -63,11 +86,15 @@ export function orgSchema() {
     },
     geo: { '@type': 'GeoCoordinates', latitude: site.geo.lat, longitude: site.geo.lng },
     openingHours: site.hours,
-    areaServed: site.areaServed.map((n) => ({ '@type': n === 'Kenya' ? 'Country' : 'City', name: n })),
+    areaServed: site.areaServed.map((n) =>
+      n === 'Kenya' ? { '@type': 'Country', name: n } : n === 'Worldwide' || n === 'East Africa' ? { '@type': 'Place', name: n } : { '@type': 'City', name: n },
+    ),
+    knowsLanguage: ['en', 'sw'],
     knowsAbout: [
       'Digital marketing', 'Search engine optimization', 'Generative engine optimization', 'Local SEO',
       'Google Business Profile', 'Social media marketing', 'Google Ads', 'Meta Ads', 'TikTok Ads',
       'Content marketing', 'Video marketing', 'WhatsApp marketing', 'Email marketing', 'Conversion rate optimization',
+      'Market entry marketing for Kenya and East Africa',
     ],
     parentOrganization: { '@type': 'Organization', name: site.legalName, url: site.mainSite },
     sameAs: [site.mainSite, ...site.socials.map((s) => s.url)],
@@ -76,8 +103,8 @@ export function orgSchema() {
       telephone: site.phoneE164,
       email: site.email,
       contactType: 'sales',
-      areaServed: 'KE',
-      availableLanguage: ['English', 'Swahili'],
+      areaServed: ['KE', 'Worldwide'],
+      availableLanguage: site.languages,
     },
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
@@ -124,41 +151,59 @@ export function faqList(faqs) {
 
 export function leadForm({ id = 'lead', title = 'Get your free growth audit', compact = false, source = 'website' } = {}) {
   const opts = services.map((s) => `<option>${esc(s.short)}</option>`).join('');
-  return `<form class="lead-form${compact ? ' compact' : ''}" id="${id}" data-source="${esc(source)}" novalidate>
+  return `<div class="lead-box" id="${id}-box">
+<form class="lead-form" id="${id}" data-source="${esc(source)}" novalidate>
   <p class="form-title">${esc(title)}</p>
-  <p class="form-sub">Reply within 1 business hour. No spam, ever.</p>
-  <div class="field"><label for="${id}-name">Your name</label><input id="${id}-name" name="name" autocomplete="name" required placeholder="e.g. Wanjiru Kamau"></div>
-  <div class="field"><label for="${id}-phone">WhatsApp / phone</label><input id="${id}-phone" name="phone" type="tel" autocomplete="tel" required placeholder="07xx xxx xxx" pattern="^(\\+?254|0)?[17]\\d{8}$"></div>
-  <div class="field"><label for="${id}-biz">Business name</label><input id="${id}-biz" name="business" autocomplete="organization" placeholder="e.g. Lanet Hardware"></div>
+  <p class="form-sub">We reply on WhatsApp during business hours. No spam, ever.</p>
+  <div class="field"><label for="${id}-name">Your name</label><input id="${id}-name" name="name" autocomplete="name" required maxlength="80" placeholder="e.g. Wanjiru Kamau" aria-describedby="${id}-status"></div>
+  <div class="field"><label for="${id}-phone">WhatsApp / phone</label><input id="${id}-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required maxlength="20" placeholder="0712 345 678 or +44 7700 900123" aria-describedby="${id}-phone-hint ${id}-status"><small class="hint" id="${id}-phone-hint">Kenyan or international number, with country code if outside Kenya.</small></div>
+  <div class="field"><label for="${id}-biz">Business name <span class="opt">(optional)</span></label><input id="${id}-biz" name="business" autocomplete="organization" maxlength="100" placeholder="e.g. Lanet Hardware"></div>
   <div class="row2">
     <div class="field"><label for="${id}-svc">I need help with</label><select id="${id}-svc" name="service"><option>Not sure yet — advise me</option>${opts}</select></div>
-    <div class="field"><label for="${id}-bud">Monthly budget</label><select id="${id}-bud" name="budget"><option>Under KES 10,000</option><option selected>KES 10,000 – 30,000</option><option>KES 30,000 – 60,000</option><option>KES 60,000 – 150,000</option><option>KES 150,000+</option></select></div>
+    <div class="field"><label for="${id}-bud">Monthly budget</label><select id="${id}-bud" name="budget"><option>Under KES 10,000</option><option selected>KES 10,000 – 30,000</option><option>KES 30,000 – 60,000</option><option>KES 60,000 – 150,000</option><option>KES 150,000+ / international</option></select></div>
   </div>
-  ${compact ? '' : `<div class="field"><label for="${id}-msg">Your biggest marketing goal</label><textarea id="${id}-msg" name="message" rows="3" placeholder="e.g. More walk-ins to our Nakuru shop"></textarea></div>`}
-  <label class="consent"><input type="checkbox" name="consent" required><span>I agree to be contacted about my enquiry, per the <a href="/privacy-policy/">Privacy Policy</a>.</span></label>
-  <button class="btn btn-ink btn-block" type="submit">${waIcon}<span>Send & chat on WhatsApp</span></button>
-  <p class="form-status" role="status" aria-live="polite"></p>
-</form>`;
+  ${compact ? '' : `<div class="field"><label for="${id}-msg">Your biggest marketing goal <span class="opt">(optional)</span></label><textarea id="${id}-msg" name="message" rows="3" maxlength="600" placeholder="e.g. More walk-ins to our Nakuru shop"></textarea></div>`}
+  <div class="hp" aria-hidden="true"><label for="${id}-web">Leave this empty</label><input id="${id}-web" name="website" tabindex="-1" autocomplete="off"></div>
+  <label class="consent" for="${id}-consent"><input type="checkbox" id="${id}-consent" name="consent" required><span>I agree to be contacted about my enquiry, per the <a href="/privacy-policy/">Privacy Policy</a>.</span></label>
+  <button class="btn btn-solid btn-block" type="submit">${waIcon}<span>Send & chat on WhatsApp</span></button>
+  <p class="form-status" id="${id}-status" role="status" aria-live="polite"></p>
+</form>
+<div class="form-done" hidden tabindex="-1">
+  <p class="form-title">${icon('check')} Almost done</p>
+  <p>Tap the button to send your details to us on WhatsApp. We reply during business hours, ${esc(site.hoursText.split(' (')[0])} ${esc(site.timezoneLabel)}.</p>
+  <a class="btn btn-solid btn-block done-wa" href="${wa('Hi Steff Cloud!')}" target="_blank" rel="noopener" data-track="whatsapp">${waIcon}<span>Open WhatsApp</span></a>
+  <p class="done-alt">No WhatsApp? Call or text <b class="sel">${esc(site.phone)}</b> or email <b class="sel">${esc(site.email)}</b>.</p>
+  <button class="link-btn done-reset" type="button">Send another enquiry</button>
+</div>
+</div>`;
 }
 
-export function ctaBand({ title = 'Ready to be impossible to ignore?', text = 'Book a free 30-minute growth audit. Walk away with a clear plan — whether you hire us or not.' } = {}) {
+export function mapEmbed(wide = false) {
+  return `<div class="map${wide ? ' wide' : ''}" data-map-src="https://www.google.com/maps?q=Emboita+Nakuru+Solai+Road&amp;output=embed">
+  <div class="map-ph">${icon('pin')}<p><b>${esc(site.address.street)}</b><br>Nakuru, Kenya</p>
+  <div class="map-actions"><button class="btn btn-solid btn-sm map-load" type="button">Show map</button><a class="btn btn-line btn-sm" href="${mapsLink}" target="_blank" rel="noopener">Open in Google Maps</a></div>
+  <small>The map is provided by Google, which may set cookies when you load it.</small></div>
+</div>`;
+}
+
+export function ctaBand({ title = 'Ready to be impossible to ignore?', text = 'Book a free 30-minute growth audit. Walk away with a clear plan, whether you hire us or not.' } = {}) {
   return `<section class="cta-band"><div class="wrap">
   <h2>${title}</h2><p>${esc(text)}</p>
-  <div class="btns"><a class="btn btn-cream" href="/free-audit/">Get my free audit ${icon('arrow')}</a>
-  <a class="btn btn-ghost-cream" href="${wa('Hi Steff Cloud, I would like to grow my business with digital marketing.')}" rel="noopener" data-track="whatsapp">${waIcon}<span>WhatsApp us</span></a></div>
+  <div class="btns"><a class="btn btn-inv" href="/free-audit/">Get my free audit ${icon('arrow')}</a>
+  <a class="btn btn-inv-line" href="${wa('Hi Steff Cloud, I would like to grow my business with digital marketing.')}" target="_blank" rel="noopener" data-track="whatsapp">${waIcon}<span>WhatsApp us</span></a></div>
 </div></section>`;
 }
 
 export function serviceCard(s) {
   return `<a class="svc-card" href="/services/${s.slug}/">
-  <span class="svc-num">${s.num}</span>${icon(s.icon, 'svc-ic')}
+  <span class="svc-num" aria-hidden="true">${s.num}</span>${icon(s.icon, 'svc-ic')}
   <h3>${esc(s.name)}</h3><p>${esc(s.hook)}</p>
-  <span class="svc-foot"><span>From ${kes(s.from)}<small>${esc(s.unit)}</small></span>${icon('arrow')}</span>
+  <span class="svc-foot"><span>From ${money(s.from)}<small>${esc(s.unit)}</small></span>${icon('arrow')}</span>
 </a>`;
 }
 
 export function postCard(p) {
-  return `<a class="post-card" href="/blog/${p.slug}/">
+  return `<a class="post-card" href="/blog/${p.slug}/" data-cat="${esc(p.category)}">
   <span class="tag">${esc(p.category)}</span>
   <h3>${esc(p.title)}</h3><p>${esc(p.description)}</p>
   <span class="meta">${fmtDate(p.date)} · ${p.minutes} min read</span>
@@ -168,30 +213,59 @@ export function postCard(p) {
 export const fmtDate = (d) =>
   new Date(d + 'T00:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
 
+export function currencySelect(id) {
+  return `<label class="cur" for="${id}">${icon('globe')}<span class="sr">Currency</span><select id="${id}" class="cur-select">${Object.keys(site.currencies)
+    .map((c) => `<option value="${c}">${c}</option>`)
+    .join('')}</select></label>`;
+}
+
 // ---------- Layout ----------
+const brandMark = (cls = '') => `<span class="brand-mark ${cls}" role="img" aria-label="Steff Cloud"></span>`;
+
 function header(current) {
   const svcLinks = services
     .map((s) => `<li><a href="/services/${s.slug}/">${icon(s.icon)}<span><b>${esc(s.short)}</b><small>${esc(s.hook)}</small></span></a></li>`)
     .join('');
   const links = nav
     .map((n) => {
-      const active = current && current.startsWith(n.href) ? ' aria-current="page"' : '';
+      const active = current && current !== '/' && current.startsWith(n.href) ? ' aria-current="page"' : '';
       if (n.children)
         return `<li class="has-mega"><a href="${n.href}"${active}>${n.label}</a><div class="mega"><ul>${svcLinks}</ul></div></li>`;
       return `<li><a href="${n.href}"${active}>${n.label}</a></li>`;
     })
     .join('');
-  return `<div class="topbar"><div class="wrap"><span class="dot" aria-hidden="true"></span><span class="tb-long">${esc(site.topbar.text)}</span><span class="tb-short">Free growth audit 🔥</span><a href="${site.topbar.href}">${esc(site.topbar.cta)} ${icon('arrow')}</a><a class="tb-phone" href="tel:${site.phoneE164}">${icon('phone')}${esc(site.phone)}</a></div></div>
+  return `<div class="topbar"><div class="wrap"><span class="dot" aria-hidden="true"></span><span class="tb-long">${esc(site.topbar.text)}</span><span class="tb-short">Free growth audit</span><a href="${site.topbar.href}">${esc(site.topbar.cta)} ${icon('arrow')}</a><span class="tb-phone">${icon('phone')}<a href="tel:${site.phoneE164}">${esc(site.phone)}</a></span></div></div>
 <header class="site-header"><div class="wrap">
-  <a class="brand" href="/" aria-label="Steff Cloud — home"><img src="/assets/img/wordmark-black.png" alt="Steff Cloud" width="86" height="58"><span class="brand-tag">digital<br>marketing</span></a>
+  <a class="brand" href="/" aria-label="Steff Cloud digital marketing, home">${brandMark()}<span class="brand-tag" aria-hidden="true">digital<br>marketing</span></a>
   <nav class="main-nav" aria-label="Main"><ul>${links}</ul></nav>
-  <div class="hdr-cta"><a class="btn btn-ink btn-sm" href="/free-audit/">Free audit ${icon('arrow')}</a>
-  <button class="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav">${icon('menu')}</button></div>
+  <div class="hdr-cta">
+    <button class="icon-btn theme-btn" type="button" aria-label="Switch to dark theme">${icon('moon', 'i-moon')}${icon('sun', 'i-sun')}</button>
+    <a class="btn btn-solid btn-sm hdr-audit" href="/free-audit/">Free audit ${icon('arrow')}</a>
+    <button class="icon-btn menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav">${icon('menu')}</button>
+  </div>
 </div>
 <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile" hidden><ul>${nav.map((n) => `<li><a href="${n.href}">${n.label}</a></li>`).join('')}${services
     .map((s) => `<li class="sub"><a href="/services/${s.slug}/">${esc(s.short)}</a></li>`)
-    .join('')}</ul><a class="btn btn-ink btn-block" href="/free-audit/">Get my free audit</a></nav>
+    .join('')}</ul><a class="btn btn-solid btn-block" href="/free-audit/">Get my free audit</a></nav>
 </header>`;
+}
+
+function cookieUi() {
+  return `<div class="cookie" id="cookie-banner" role="region" aria-label="Cookie consent" hidden>
+  <p class="cookie-h">${icon('cookie')} Your privacy, your choice</p>
+  <p>We use essential storage to run this site. With your permission we also use analytics and marketing cookies to improve it and measure our ads. Read the <a href="/cookie-policy/">Cookie Policy</a>.</p>
+  <div class="cookie-btns"><button class="btn btn-inv btn-sm" type="button" data-consent="all">Accept all</button><button class="btn btn-inv-line btn-sm" type="button" data-consent="none">Reject all</button><button class="link-btn inv" type="button" data-consent="customize">Customise</button></div>
+</div>
+<dialog class="cookie-dlg" id="cookie-dialog" aria-labelledby="cookie-dlg-title">
+  <form method="dialog" class="cookie-form">
+    <p class="form-title" id="cookie-dlg-title">Cookie preferences</p>
+    <p class="muted">Choose which optional cookies we may use. You can change this any time from “Cookie settings” in the footer.</p>
+    <div class="ck-row"><div><b>Strictly necessary</b><span>Remembers your cookie, theme and currency choices. Always on.</span></div><input type="checkbox" checked disabled aria-label="Strictly necessary, always on"></div>
+    <div class="ck-row"><div><label for="ck-analytics"><b>Analytics</b></label><span>Google Analytics 4 tells us which pages help visitors most. IP addresses are anonymised.</span></div><input type="checkbox" id="ck-analytics" name="analytics"></div>
+    <div class="ck-row"><div><label for="ck-marketing"><b>Marketing</b></label><span>Lets Meta and Google measure our ads and show you relevant offers.</span></div><input type="checkbox" id="ck-marketing" name="marketing"></div>
+    <div class="cookie-btns"><button class="btn btn-solid btn-sm" value="save" type="submit">Save choices</button><button class="btn btn-line btn-sm" value="all" type="submit">Accept all</button></div>
+  </form>
+</dialog>`;
 }
 
 function footer() {
@@ -204,55 +278,76 @@ function footer() {
 <div class="wrap">
   <div class="f-top">
     <div class="f-brand">
-      <img src="/assets/img/logo-cream.png" alt="Steff Cloud — Creative Agency, estd 2026" width="172" height="145">
-      <p>Digital marketing that brings real clients, not just likes. Based in Nakuru, serving all of Kenya.</p>
+      <span class="logo-mark" role="img" aria-label="Steff Cloud, Creative Agency, established 2026"></span>
+      <p>Digital marketing that brings real clients, not just likes. Based in Nakuru, serving Kenya and the world.</p>
+      <p class="open-status" data-open-status><span class="dot" aria-hidden="true"></span><span class="os-text">Mon–Sat, 8am–6pm ${esc(site.timezoneLabel)}</span></p>
       <ul class="f-contact">
-        <li><a href="tel:${site.phoneE164}">${icon('phone')}${esc(site.phone)}</a></li>
-        <li><a href="mailto:${site.email}">${icon('mail')}${esc(site.email)}</a></li>
-        <li><span>${icon('pin')}${esc(site.address.street)}, ${esc(site.address.locality)}</span></li>
-        <li><span>${icon('clock')}${esc(site.hoursText)}</span></li>
+        <li>${icon('phone')}<a href="tel:${site.phoneE164}">${esc(site.phone)}</a></li>
+        <li>${icon('mail')}<a href="mailto:${site.email}">${esc(site.email)}</a></li>
+        <li>${icon('pin')}<span>${esc(site.address.street)}, ${esc(site.address.locality)}, Kenya</span></li>
+        <li>${icon('clock')}<span>${esc(site.hoursText)}</span></li>
       </ul>${socials}
     </div>
     ${col('Services', services.map((s) => [s.short, `/services/${s.slug}/`]))}
-    ${col('Company', [['About', '/about/'], ['Pricing', '/pricing/'], ['Digital marketing Nakuru', '/digital-marketing-agency-nakuru/'], ['Free audit', '/free-audit/'], ['Contact', '/contact/'], ['FAQ', '/faq/'], ['Main site', site.mainSite]])}
+    ${col('Company', [['About', '/about/'], ['Pricing', '/pricing/'], ['Nakuru agency', '/digital-marketing-agency-nakuru/'], ['International clients', '/international/'], ['Free audit', '/free-audit/'], ['Contact', '/contact/'], ['FAQ', '/faq/'], ['Steff Cloud main site', site.mainSite]])}
     ${col('Learn', [['Blog', '/blog/'], ['Glossary', '/learn/digital-marketing-glossary/'], ['What is GEO?', '/blog/what-is-geo-generative-engine-optimization/'], ['Marketing in Kenya', '/blog/digital-marketing-in-kenya-guide/'], ['Rank on Google Maps', '/blog/google-business-profile-nakuru-guide/']])}
-    ${col('Legal', [['Privacy Policy', '/privacy-policy/'], ['Terms of Service', '/terms/'], ['Cookie Policy', '/cookie-policy/'], ['Refund Policy', '/refund-policy/']])}
+    <div class="f-col"><p class="f-h">Legal</p><ul>${[['Privacy Policy', '/privacy-policy/'], ['Terms of Service', '/terms/'], ['Cookie Policy', '/cookie-policy/'], ['Refund Policy', '/refund-policy/'], ['Disclaimer', '/disclaimer/'], ['Accessibility', '/accessibility/'], ['Legal Notice', '/legal-notice/']]
+      .map(([n, h]) => `<li><a href="${h}">${n}</a></li>`)
+      .join('')}<li><button class="link-btn inv" type="button" data-open-cookies>Cookie settings</button></li></ul></div>
   </div>
   <div class="f-mark">
     <svg class="f-name" viewBox="0 0 1000 300" role="img" aria-label="${esc(site.legalName.toUpperCase())}">
       <text x="0" y="138" textLength="1000" lengthAdjust="spacingAndGlyphs">STEFF CLOUD</text>
       <text x="0" y="292" textLength="1000" lengthAdjust="spacing">LIMITED</text>
     </svg>
-    <p class="f-cn" lang="zh-Hans" aria-label="Steff Cloud in Chinese">${site.chineseName}</p>
+    <p class="f-cn" lang="zh-Hans" aria-label="${esc(site.chineseName)}, Steff Cloud in Chinese">${site.chineseName}</p>
   </div>
-  <div class="f-bottom"><p>© ${new Date().getFullYear()} ${esc(site.legalName)}. All rights reserved. Registered in Kenya.</p><p>Made with intent in Nakuru 🇰🇪</p></div>
+  <div class="f-bottom"><p>© ${new Date().getFullYear()} ${esc(site.legalName)}. All rights reserved.</p>${currencySelect('cur-footer')}<p>Made with intent in Nakuru, Kenya</p></div>
 </div>
 </footer>
-<div class="m-bar"><a href="${wa('Hi Steff Cloud, I want more customers. Can we talk?')}" rel="noopener" data-track="whatsapp">${waIcon}WhatsApp</a><a href="tel:${site.phoneE164}" data-track="call">${icon('phone')}Call</a><a class="hl" href="/free-audit/">Free audit</a></div>
-<a class="wa-float" href="${wa('Hi Steff Cloud, I want more customers. Can we talk?')}" rel="noopener" aria-label="Chat with Steff Cloud on WhatsApp" data-track="whatsapp">${waIcon}</a>`;
+<div class="m-bar"><a href="${wa('Hi Steff Cloud, I want more customers. Can we talk?')}" target="_blank" rel="noopener" data-track="whatsapp">${waIcon}WhatsApp</a><a href="tel:${site.phoneE164}" data-track="call">${icon('phone')}Call</a><a class="hl" href="/free-audit/">Free audit</a></div>
+<a class="wa-float" href="${wa('Hi Steff Cloud, I want more customers. Can we talk?')}" target="_blank" rel="noopener" aria-label="Chat with Steff Cloud on WhatsApp" data-track="whatsapp">${waIcon}</a>
+${cookieUi()}`;
+}
+
+function clientConfig() {
+  return {
+    wa: site.whatsapp,
+    phone: site.phone,
+    ga4: site.ga4,
+    metaPixel: site.metaPixel,
+    formEndpoint: site.formEndpoint,
+    tz: site.timezone,
+    currencies: site.currencies,
+  };
 }
 
 export function page({ path, title, description, body, schema = [], type = 'website', image = '/assets/img/og-default.jpg', noindex = false, extraHead = '' }) {
   const canonical = abs(path);
-  const ld = [orgSchema(), ...schema].map((s) => `<script type="application/ld+json">${JSON.stringify(s)}</script>`).join('\n');
-  const ga = site.ga4 ? `<meta name="ga4" content="${esc(site.ga4)}">` : '';
+  const ld = [orgSchema(), ...schema].map((s) => `<script type="application/ld+json">${JSON.stringify(s).replace(/</g, '\\u003c')}</script>`).join('\n');
   return `<!doctype html>
-<html lang="en-KE"${site.formEndpoint ? ` data-form-endpoint="${esc(site.formEndpoint)}"` : ''}>
+<html lang="en-KE">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>${esc(title)}</title>
+<script>${themeBoot}</script>
 <meta name="description" content="${esc(description)}">
 <link rel="canonical" href="${canonical}">
 <meta name="robots" content="${noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'}">
 <link rel="alternate" hreflang="en-KE" href="${canonical}">
+<link rel="alternate" hreflang="en" href="${canonical}">
 <link rel="alternate" hreflang="x-default" href="${canonical}">
 <meta name="geo.region" content="KE-31">
 <meta name="geo.placename" content="Nakuru">
 <meta name="geo.position" content="${site.geo.lat};${site.geo.lng}">
 <meta name="ICBM" content="${site.geo.lat}, ${site.geo.lng}">
 <meta name="author" content="${esc(site.legalName)}">
-<meta name="theme-color" content="#0b0b0b">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="format-detection" content="telephone=no">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f5f4f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0e0d" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="${type}">
 <meta property="og:site_name" content="${esc(site.name)}">
 <meta property="og:locale" content="en_KE">
@@ -261,6 +356,7 @@ export function page({ path, title, description, body, schema = [], type = 'webs
 <meta property="og:url" content="${canonical}">
 <meta property="og:image" content="${abs(image)}">
 <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Steff Cloud logo with the line: Digital marketing that sells.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${esc(title)}">
 <meta name="twitter:description" content="${esc(description)}">
@@ -269,14 +365,14 @@ export function page({ path, title, description, body, schema = [], type = 'webs
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32.png">
 <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
-<link rel="alternate" type="application/rss+xml" title="Steff Cloud — Digital Marketing Blog" href="/blog/feed.xml">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Inter:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@900&display=swap&text=${encodeURIComponent(site.chineseName)}">
-<link rel="stylesheet" href="/assets/css/styles.css">
-${ga}${extraHead}
+<link rel="alternate" type="application/rss+xml" title="Steff Cloud Digital Marketing Blog" href="/blog/feed.xml">
+<link rel="preload" href="/assets/fonts/unbounded-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/styles.css?v=${assetVersion.css}">
+${extraHead}
 ${ld}
+<script type="application/json" id="sc-config">${JSON.stringify(clientConfig()).replace(/</g, '\\u003c')}</script>
+<script src="/assets/js/main.js?v=${assetVersion.js}" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -285,7 +381,6 @@ ${header(path)}
 ${body}
 </main>
 ${footer()}
-<script src="/assets/js/main.js" defer></script>
 </body>
 </html>
 `;

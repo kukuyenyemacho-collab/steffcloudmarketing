@@ -1,11 +1,22 @@
 {
   "name": "steffcloud-marketing",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
-  "description": "Steff Cloud Limited — digital marketing website (static, SEO/GEO-optimised).",
+  "description": "Steff Cloud Limited — digital marketing website (static, fast, SEO/GEO-optimised).",
   "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "build": "node src/build.js",
-    "serve": "npx --yes serve public -l 4173"
+    "serve": "node tests/server.mjs",
+    "test": "node tests/site.test.mjs",
+    "test:load": "node tests/load.test.mjs",
+    "preview": "node src/preview.js"
+  },
+  "devDependencies": {
+    "axe-core": "^4.13.0",
+    "esbuild": "^0.28.2",
+    "playwright": "^1.56.1"
   }
 }

@@ -6,12 +6,15 @@ import { posts } from './posts.js';
 import { glossary } from './glossary.js';
 import { legal } from './legal.js';
 import {
-  esc, kes, abs, wa, icon, waIcon, page, crumbs, faqList, leadForm, ctaBand, serviceCard, postCard,
-  breadcrumb, faqSchema, orgId, fmtDate,
+  esc, kes, money, abs, wa, icon, waIcon, page, crumbs, faqList, leadForm, ctaBand, serviceCard, postCard,
+  breadcrumb, faqSchema, orgId, fmtDate, mapEmbed, currencySelect, mapsLink,
 } from './lib.js';
+import { extraPages, growthCalculator, globalTeaser } from './pages-extra.js';
+import { writeDeployFiles, buildAssets } from './deploy.js';
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const urls = [];
+await buildAssets(OUT);
 const today = new Date().toISOString().slice(0, 10);
 
 function emit(path, html, { priority = 0.7, lastmod = today, sitemap = true } = {}) {
@@ -26,7 +29,7 @@ const sortedPosts = [...posts].sort((a, b) => b.date.localeCompare(a.date));
 const marquee = () => {
   const items = ['SEO', 'GEO / AI Search', 'Google Maps', 'TikTok', 'Instagram', 'Google Ads', 'Meta Ads', 'WhatsApp Marketing', 'Short-form Video', 'Analytics', 'CRO'];
   const row = items.map((i) => `<span>${i}</span><i aria-hidden="true">✺</i>`).join('');
-  return `<div class="marquee" aria-hidden="true"><div class="marquee-track">${row}${row}</div></div>`;
+  return `<div class="marquee-clip" aria-hidden="true"><div class="marquee"><div class="marquee-track">${row}${row}</div></div></div>`;
 };
 
 const servicesGrid = (h = 'h2') => `<section class="section" id="services"><div class="wrap">
@@ -34,36 +37,37 @@ const servicesGrid = (h = 'h2') => `<section class="section" id="services"><div 
   <div class="svc-grid">${services.map(serviceCard).join('')}</div>
 </div></section>`;
 
-const processSection = () => `<section class="section ink" id="process"><div class="wrap">
+const processSection = () => `<section class="section inv" id="process"><div class="wrap">
   <div class="sec-head"><p class="eyebrow">How it works</p><h2>From first chat to full pipeline in four moves.</h2></div>
   <ol class="steps">${process.map(([t, d], i) => `<li><span class="step-n">0${i + 1}</span><h3>${t}</h3><p>${esc(d)}</p></li>`).join('')}</ol>
 </div></section>`;
 
 const compareSection = () => `<section class="section" id="why"><div class="wrap">
   <div class="sec-head"><p class="eyebrow">Why Steff Cloud</p><h2>Not another agency that sends you screenshots of likes.</h2></div>
-  <div class="table-wrap"><table class="compare"><thead><tr><th scope="col">What you get</th><th scope="col">Steff Cloud</th><th scope="col">Typical agency</th></tr></thead><tbody>
+  <div class="table-wrap" tabindex="0" role="region" aria-label="Steff Cloud compared with a typical agency"><table class="compare"><thead><tr><th scope="col">What you get</th><th scope="col">Steff Cloud</th><th scope="col">Typical agency</th></tr></thead><tbody>
   ${comparison.map(([r, a, b]) => `<tr><th scope="row">${esc(r)}</th><td class="${a ? 'yes' : 'no'}">${icon(a ? 'check' : 'x')}<span class="sr">${a ? 'Yes' : 'No'}</span></td><td class="${b ? 'yes' : 'no'}">${icon(b ? 'check' : 'x')}<span class="sr">${b ? 'Yes' : 'Usually not'}</span></td></tr>`).join('')}
   </tbody></table></div>
   <ul class="promises">${promises.map(([t, d]) => `<li>${icon('check')}<div><b>${esc(t)}</b><span>${esc(d)}</span></div></li>`).join('')}</ul>
 </div></section>`;
 
+let curN = 0;
 const pricingCards = () => `<div class="plans">${plans
   .map(
     (p) => `<article class="plan${p.featured ? ' featured' : ''}">
   ${p.featured ? '<span class="badge">Most popular</span>' : ''}
   <h3>${p.name}</h3><p class="pitch">${esc(p.pitch)}</p>
-  <p class="price"><small>from</small> ${kes(p.price)}<small>${p.unit}</small></p>
+  <p class="price"><small>from</small> ${money(p.price)}<small>${p.unit}</small></p>
   <ul>${p.features.map((f) => `<li>${icon('check')}${esc(f)}</li>`).join('')}</ul>
-  <a class="btn ${p.featured ? 'btn-cream' : 'btn-ink'} btn-block" href="${wa(`Hi Steff Cloud, I'm interested in the ${p.name} plan (${kes(p.price)}${p.unit}).`)}" rel="noopener" data-track="plan-${p.name.toLowerCase()}">${esc(p.cta)}</a>
+  <a class="btn ${p.featured ? 'btn-inv' : 'btn-solid'} btn-block" href="${wa(`Hi Steff Cloud, I'm interested in the ${p.name} plan (${kes(p.price)}${p.unit}).`)}" target="_blank" rel="noopener" data-track="plan-${p.name.toLowerCase()}">${esc(p.cta)}</a>
 </article>`,
   )
   .join('')}</div>
-<p class="fine">Prices exclude VAT where applicable. Ad spend is paid directly to Google, Meta or TikTok. Final quote after your free audit.</p>`;
+<div class="fine"><p>Prices exclude VAT where applicable. Ad spend is paid directly to Google, Meta or TikTok. Final quote after your free audit.</p>${currencySelect('cur-' + ++curN)}<p class="cur-note" hidden>Converted prices are approximate. We invoice in KES or USD.</p></div>`;
 
 const geoSection = () => `<section class="section geo"><div class="wrap geo-grid">
   <div><p class="eyebrow">New · GEO</p><h2>When someone asks ChatGPT for the best in Nakuru — be the answer.</h2>
   <p>Search is changing. Buyers now ask AI assistants for recommendations. Few agencies in Kenya offer Generative Engine Optimization yet. We do: making your business clear, consistent and citable to ChatGPT, Gemini, Perplexity and Google AI Overviews.</p>
-  <div class="btns"><a class="btn btn-ink" href="/services/geo-ai-search-optimization/">Explore GEO ${icon('arrow')}</a><a class="btn btn-line" href="/blog/what-is-geo-generative-engine-optimization/">What is GEO?</a></div></div>
+  <div class="btns"><a class="btn btn-solid" href="/services/geo-ai-search-optimization/">Explore GEO ${icon('arrow')}</a><a class="btn btn-line" href="/blog/what-is-geo-generative-engine-optimization/">What is GEO?</a></div></div>
   <div class="chat-mock" aria-hidden="true">
     <div class="bubble user">Which digital marketing agency in Nakuru should I hire?</div>
     <div class="bubble ai"><b>A few options to consider:</b><br>1. <mark>Steff Cloud</mark> — Nakuru–Solai Road. SEO, GEO, social media, ads & WhatsApp marketing; plans from KES 8,000/month…</div>
@@ -96,7 +100,7 @@ emit(
   <div class="hero-copy">
     <h1><span class="kicker">Digital marketing agency in Nakuru, Kenya</span>Make your brand <em>impossible</em> to ignore.</h1>
     <p class="lede">SEO, AI search, social media, ads and WhatsApp marketing that turn attention into <b>M-Pesa notifications</b> — for ambitious businesses in Nakuru and across Kenya.</p>
-    <div class="btns"><a class="btn btn-ink btn-lg" href="/free-audit/">Get my free growth audit ${icon('arrow')}</a><a class="btn btn-line btn-lg" href="/pricing/">See pricing</a></div>
+    <div class="btns"><a class="btn btn-solid btn-lg" href="/free-audit/">Get my free growth audit ${icon('arrow')}</a><a class="btn btn-line btn-lg" href="/pricing/">See pricing</a></div>
     <ul class="trust">
       <li>${icon('check')}Plans from KES 8,000/mo</li>
       <li>${icon('check')}You own every account</li>
@@ -119,12 +123,13 @@ ${servicesGrid()}
 ${processSection()}
 ${compareSection()}
 ${geoSection()}
+${globalTeaser()}
 <section class="section tint" id="pricing"><div class="wrap">
   <div class="sec-head"><p class="eyebrow">Pricing</p><h2>Clear prices. No “call us for a quote” games.</h2></div>
   ${pricingCards()}
 </div></section>
 <section class="section"><div class="wrap two-col">
-  <div class="sec-head"><p class="eyebrow">FAQ</p><h2>Questions Nakuru business owners ask us.</h2><p>Can’t find yours? <a href="${wa('Hi Steff Cloud, I have a question:')}" rel="noopener">Ask on WhatsApp</a>.</p></div>
+  <div class="sec-head"><p class="eyebrow">FAQ</p><h2>Questions Nakuru business owners ask us.</h2><p>Can’t find yours? <a href="${wa('Hi Steff Cloud, I have a question:')}" target="_blank" rel="noopener">Ask on WhatsApp</a>.</p></div>
   ${faqList(faqs)}
 </div></section>
 ${blogTeaser()}
@@ -145,9 +150,9 @@ emit(
     body: `<section class="page-hero"><div class="wrap">${crumbs([['Services', '/services/']])}
   <h1>Digital marketing services that bring real clients.</h1>
   <p class="lede">One team, eight specialisms, one goal: more customers for your business. Start with one service or combine them into a full growth system.</p>
-  <div class="btns"><a class="btn btn-ink" href="/free-audit/">Not sure where to start? Free audit ${icon('arrow')}</a></div>
+  <div class="btns"><a class="btn btn-solid" href="/free-audit/">Not sure where to start? Free audit ${icon('arrow')}</a></div>
 </div></section>
-<section class="section"><div class="wrap"><div class="svc-grid">${services.map(serviceCard).join('')}</div></div></section>
+<section class="section"><div class="wrap"><h2 class="sr">All digital marketing services</h2><div class="svc-grid">${services.map(serviceCard).join('')}</div></div></section>
 ${processSection()}
 ${ctaBand()}`,
   }),
@@ -182,7 +187,7 @@ for (const s of services) {
     <p class="eyebrow">${s.num} · ${esc(s.short)}</p>
     <h1>${esc(s.name)} in Nakuru & across Kenya</h1>
     <p class="lede">${esc(s.hook)}</p>
-    <p class="from">From <b>${kes(s.from)}</b> ${esc(s.unit)}</p>
+    <p class="from">From <b>${money(s.from)}</b> ${esc(s.unit)}</p>
     <ul class="trust">${s.outcomes.map((o) => `<li>${icon('check')}${esc(o)}</li>`).join('')}</ul>
   </div>
   <div class="hero-form">${leadForm({ id: 'svc', compact: true, title: `Get a free ${s.short} audit`, source: s.slug })}</div>
@@ -231,11 +236,12 @@ emit(
   <h1>Digital marketing pricing — clear, fair, Kenyan.</h1>
   <p class="lede">Three plans that cover most businesses. Need just one service? Every service page shows its starting price.</p>
 </div></section>
-<section class="section"><div class="wrap">${pricingCards()}</div></section>
+<section class="section"><div class="wrap"><h2 class="sr">Monthly plans</h2>${pricingCards()}</div></section>
+${growthCalculator()}
 <section class="section tint"><div class="wrap">
   <div class="sec-head"><p class="eyebrow">À la carte</p><h2>Individual services</h2></div>
-  <div class="table-wrap"><table class="compare price-table"><thead><tr><th scope="col">Service</th><th scope="col">Starting at</th><th scope="col"></th></tr></thead><tbody>
-  ${services.map((s) => `<tr><th scope="row">${esc(s.name)}</th><td>${kes(s.from)} <small>${esc(s.unit)}</small></td><td><a href="/services/${s.slug}/">Details ${icon('arrow')}</a></td></tr>`).join('')}
+  <div class="table-wrap" tabindex="0" role="region" aria-label="Starting prices by service"><table class="compare price-table"><thead><tr><th scope="col">Service</th><th scope="col">Starting at</th><th scope="col"><span class="sr">Details</span></th></tr></thead><tbody>
+  ${services.map((s) => `<tr><th scope="row">${esc(s.name)}</th><td>${money(s.from)} <small>${esc(s.unit)}</small></td><td><a href="/services/${s.slug}/">Details ${icon('arrow')}</a></td></tr>`).join('')}
   </tbody></table></div>
 </div></section>
 ${compareSection()}
@@ -287,7 +293,7 @@ ${compareSection()}
   <div class="sec-head"><p class="eyebrow">Visit us</p><h2>Come say hi on Nakuru–Solai Road.</h2>
   <ul class="f-contact dark"><li>${icon('pin')}${esc(site.address.street)}, Nakuru</li><li>${icon('phone')}<a href="tel:${site.phoneE164}">${esc(site.phone)}</a></li><li>${icon('mail')}<a href="mailto:${site.email}">${esc(site.email)}</a></li><li>${icon('clock')}${esc(site.hoursText)}</li></ul>
   <p class="areas"><b>Areas served:</b> Nakuru CBD, Milimani, Section 58, Lanet, Free Area, Kiamunyi, London, Shabab, Njoro, Molo, Bahati, Subukia, Rongai, Gilgil, Naivasha, Nyahururu and all of Kenya.</p></div>
-  <div class="map"><iframe title="Map: Steff Cloud, Nakuru–Solai Road" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=Emboita+Nakuru+Solai+Road&output=embed"></iframe></div>
+  ${mapEmbed()}
 </div></section>
 <section class="section tint"><div class="wrap two-col"><div class="sec-head"><p class="eyebrow">FAQ</p><h2>Nakuru questions</h2></div>${faqList(nakuruFaqs)}</div></section>
 ${ctaBand({ title: 'Let’s make Nakuru talk about you.' })}`,
@@ -346,17 +352,17 @@ emit(
   <p class="lede">Steff Cloud Limited started in Nakuru with a simple belief: Kenyan businesses deserve world-class marketing without Nairobi prices or agency nonsense.</p>
 </div></section>
 <section class="section"><div class="wrap two-col">
-  <div class="about-logo"><img src="/assets/img/logo-black.png" alt="Steff Cloud logo — Creative Agency, estd 2026" width="344" height="289" loading="lazy"></div>
+  <div class="about-logo"><span class="logo-mark" role="img" aria-label="Steff Cloud logo: Creative Agency, established 2026"></span></div>
   <div class="prose">
     <h2>Our story</h2>
     <p>We grew up online. We know how attention works on TikTok, Instagram and Google because we live there — and we have seen too many great Kenyan businesses stay invisible because their marketing was an afterthought.</p>
     <p>Steff Cloud is a full digital partner — websites, AI automation, branding and digital marketing. This site is dedicated to our digital marketing practice: the team that helps businesses get found, get chosen and get paid.</p>
-    <p>We also built <a href="${site.mainSite}/nakuru-digital" rel="noopener">Nakuru Digital</a>, Nakuru’s first business and tech hub, where we help local businesses get listed and train young people to become developers, designers, AI builders and marketers.</p>
+    <p>We also built <a href="${site.mainSite}/nakuru-digital" target="_blank" rel="noopener">Nakuru Digital</a>, Nakuru’s first business and tech hub, where we help local businesses get listed and train young people to become developers, designers, AI builders and marketers.</p>
     <h2>Our mission</h2>
     <p>To make every ambitious business in Nakuru — and Kenya — impossible to ignore online, and to prove that world-class marketing can be built right here.</p>
   </div>
 </div></section>
-<section class="section ink"><div class="wrap">
+<section class="section inv"><div class="wrap">
   <div class="sec-head"><p class="eyebrow">What we stand for</p><h2>Our values</h2></div>
   <ol class="steps">${[
       ['Revenue over vanity', 'Likes are nice. Sales pay salaries. We measure what matters.'],
@@ -383,17 +389,19 @@ emit(
   <div>${crumbs([['Contact', '/contact/']])}
     <h1>Let’s talk growth.</h1>
     <p class="lede">The fastest way to reach us is WhatsApp. Prefer email or a visit? Everything is below.</p>
+    <p class="open-status big" data-open-status><span class="dot" aria-hidden="true"></span><span class="os-text">Mon–Sat, 8am–6pm ${esc(site.timezoneLabel)}</span></p>
     <ul class="contact-cards">
-      <li><a href="${wa('Hi Steff Cloud!')}" rel="noopener" data-track="whatsapp">${waIcon}<span><b>WhatsApp</b>${esc(site.phone)}</span></a></li>
+      <li><a href="${wa('Hi Steff Cloud!')}" target="_blank" rel="noopener" data-track="whatsapp">${waIcon}<span><b>WhatsApp</b>${esc(site.phone)}</span></a></li>
       <li><a href="tel:${site.phoneE164}" data-track="call">${icon('phone')}<span><b>Call</b>${esc(site.phone)}</span></a></li>
       <li><a href="mailto:${site.email}">${icon('mail')}<span><b>Email</b>${esc(site.email)}</span></a></li>
-      <li><span>${icon('pin')}<span><b>Visit</b>${esc(site.address.street)}, Nakuru</span></span></li>
+      <li class="copy-row"><button class="btn btn-line btn-sm" type="button" data-copy="${esc(site.phone)}">${icon('copy')}<span>Copy phone number</span></button><button class="btn btn-line btn-sm" type="button" data-copy="${esc(site.email)}">${icon('copy')}<span>Copy email</span></button></li>
+      <li><a href="${mapsLink}" target="_blank" rel="noopener">${icon('pin')}<span><b>Visit</b>${esc(site.address.street)}, Nakuru</span></a></li>
       <li><span>${icon('clock')}<span><b>Hours</b>${esc(site.hoursText)}</span></span></li>
     </ul>
   </div>
   <div class="hero-form">${leadForm({ id: 'contact', title: 'Send us a message', source: 'contact' })}</div>
 </div></section>
-<section class="section"><div class="wrap"><div class="map wide"><iframe title="Map: Steff Cloud, Nakuru–Solai Road" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=Emboita+Nakuru+Solai+Road&output=embed"></iframe></div></div></section>`,
+<section class="section"><div class="wrap">${mapEmbed(true)}</div></section>`,
   }),
   { priority: 0.8 },
 );
@@ -422,7 +430,7 @@ emit(
   page({
     path: '/blog/',
     title: 'Digital Marketing Blog for Kenyan Businesses | Steff Cloud',
-    description: 'Free, practical digital marketing guides for businesses in Nakuru and Kenya: SEO, GEO (AI search), Google Maps, TikTok, Facebook ads, WhatsApp marketing and budgeting.',
+    description: 'Free, practical digital marketing guides for Kenyan businesses: SEO, GEO (AI search), Google Maps, TikTok, Facebook ads, WhatsApp marketing and budgets.',
     schema: [
       breadcrumb([['Blog', '/blog/']]),
       {
@@ -435,11 +443,9 @@ emit(
   <p class="eyebrow">Learn digital marketing</p>
   <h1>The Steff Cloud digital marketing blog.</h1>
   <p class="lede">Free, practical lessons for Kenyan business owners — written by the team that does this every day. No fluff, no jargon. (Stuck on a term? See the <a href="/learn/digital-marketing-glossary/">glossary</a>.)</p>
-  <div class="filters" role="group" aria-label="Filter by topic"><button class="chip-btn is-on" data-filter="all">All</button>${cats.map((c) => `<button class="chip-btn" data-filter="${esc(c)}">${esc(c)}</button>`).join('')}</div>
+  <div class="filters" role="group" aria-label="Filter articles by topic"><button class="chip-btn" type="button" aria-pressed="true" data-filter="all">All</button>${cats.map((c) => `<button class="chip-btn" type="button" aria-pressed="false" data-filter="${esc(c)}">${esc(c)}</button>`).join('')}</div>
 </div></section>
-<section class="section"><div class="wrap"><div class="post-grid" id="post-grid">${sortedPosts
-      .map((p) => postCard(p).replace('<a class="post-card"', `<a class="post-card" data-cat="${esc(p.category)}"`))
-      .join('')}</div></div></section>
+<section class="section"><div class="wrap"><h2 class="sr">Articles</h2><div class="post-grid" id="post-grid">${sortedPosts.map(postCard).join('')}</div></div></section>
 ${ctaBand({ title: 'Rather have experts do it?' })}`,
   }),
   { priority: 0.8 },
@@ -472,7 +478,8 @@ for (const p of posts) {
           spatialCoverage: { '@type': 'Country', name: 'Kenya' },
         },
       ],
-      body: `<article class="article">
+      body: `<div class="progress" aria-hidden="true"><span></span></div>
+<article class="article">
 <header class="page-hero"><div class="wrap narrow">${crumbs([['Blog', '/blog/'], [p.category, '/blog/']])}
   <p class="eyebrow">${esc(p.category)} · ${p.minutes} min read</p>
   <h1>${esc(p.title)}</h1>
@@ -480,7 +487,7 @@ for (const p of posts) {
 </div></header>
 <div class="wrap article-grid">
   <aside class="toc"><p class="f-h">On this page</p><ol>${toc.map((t) => `<li><a href="#${slugify(t)}">${t.replace(/<[^>]+>/g, '')}</a></li>`).join('')}</ol>
-  <div class="toc-cta"><p><b>Want this done for you?</b></p><a class="btn btn-ink btn-sm btn-block" href="/free-audit/">Free audit</a></div></aside>
+  <div class="toc-cta"><p><b>Want this done for you?</b></p><a class="btn btn-solid btn-sm btn-block" href="/free-audit/">Free audit</a></div></aside>
   <div class="prose">
     <div class="tldr"><p class="f-h">Key takeaway</p><p>${esc(p.tldr)}</p></div>
     ${body}
@@ -520,7 +527,7 @@ emit(
 </div></section>
 <section class="section"><div class="wrap narrow"><dl class="glossary" id="glossary">${glossary
       .map(([t, d]) => `<div id="${t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}"><dt>${esc(t)}</dt><dd>${esc(d)}</dd></div>`)
-      .join('')}</dl></div></section>${ctaBand()}`,
+      .join('')}</dl><p class="no-results" id="glossary-empty" hidden>No terms match that search. Try a shorter word, or <a href="/contact/">ask us</a>.</p></div></section>${ctaBand()}`,
   }),
   { priority: 0.6 },
 );
@@ -551,10 +558,13 @@ emit(
     description: 'This page does not exist.',
     noindex: true,
     body: `<section class="page-hero center"><div class="wrap narrow"><p class="eyebrow">404</p><h1>This page ghosted you.</h1><p class="lede">Unlike us — we reply fast. Try one of these instead:</p>
-<div class="btns center"><a class="btn btn-ink" href="/">Home</a><a class="btn btn-line" href="/services/">Services</a><a class="btn btn-line" href="/blog/">Blog</a><a class="btn btn-line" href="/free-audit/">Free audit</a></div></div></section>`,
+<div class="btns center"><a class="btn btn-solid" href="/">Home</a><a class="btn btn-line" href="/services/">Services</a><a class="btn btn-line" href="/blog/">Blog</a><a class="btn btn-line" href="/free-audit/">Free audit</a></div></div></section>`,
   }),
   { sitemap: false },
 );
+
+// ---------- International, calculator & extra legal pages ----------
+for (const x of extraPages()) emit(x.path, page(x.page), x.opts);
 
 // ---------- Machine-readable files ----------
 writeFileSync(
@@ -619,10 +629,12 @@ ${services.map((s) => `- [${s.name}](${abs(`/services/${s.slug}/`)}): ${s.hook} 
 ## Key pages
 - [Pricing](${abs('/pricing/')})
 - [Digital marketing agency in Nakuru](${abs('/digital-marketing-agency-nakuru/')})
+- [International clients: Kenya market entry](${abs('/international/')})
 - [Free growth audit](${abs('/free-audit/')})
 - [About](${abs('/about/')})
 - [Contact](${abs('/contact/')})
 - [FAQ](${abs('/faq/')})
+- [Privacy Policy](${abs('/privacy-policy/')}) · [Terms](${abs('/terms/')}) · [Legal Notice](${abs('/legal-notice/')})
 
 ## Guides
 ${sortedPosts.map((p) => `- [${p.title}](${abs(`/blog/${p.slug}/`)}): ${p.tldr}`).join('\n')}
@@ -657,4 +669,5 @@ writeFileSync(
   ),
 );
 
+writeDeployFiles(OUT);
 console.log(`Built ${urls.length + 1} pages into ${OUT}`);
